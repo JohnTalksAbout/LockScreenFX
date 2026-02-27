@@ -1497,14 +1497,17 @@ async function renderToCanvas(){
   const showPhCheck   = document.getElementById('show-phrases').checked;
   const footerPreCheck= document.getElementById('footer-text').value.trim();
   const maxRows = largeText ? 8 : currentRows;
-  let curY = Math.round(H*0.33);  // clear iOS clock — declared here so availH calc can use it
+  let curY = Math.round(H*0.30);  // clear iOS clock — declared here so availH calc can use it
 
   // Dynamically calculate row height so table never overlaps phrases/footer
   // Bottom block: stamp(26+30) + optional footer(34+16+20) + phrases(label+lines) + separator+margins
   const phLinesCount = showPhCheck ? document.getElementById('phrases').value.trim().split('\n').filter(l=>l.trim()).length : 0;
   const clampedPhLines = Math.min(phLinesCount, largeText?3:5);
-  const bottomBlockH = Math.round(r*(
-    30 + fStamp +                                          // stamp
+  // safeBottom = H*0.905 to clear iOS torch/camera icons at lock screen bottom
+  const safeBottomCalc = Math.round(H*0.905);
+  const bottomBlockH = (H - safeBottomCalc) +              // space below safe zone
+    Math.round(r*(
+    10 + fStamp +                                          // stamp
     20 +                                                   // gap above stamp
     (footerPreCheck ? fFooter + 16 + 20 : 0) +           // optional footer
     (showPhCheck && phLinesCount>0 ?
@@ -1615,9 +1618,10 @@ async function renderToCanvas(){
   ctx.font=`400 ${fStamp}px -apple-system,system-ui,sans-serif`;
   ctx.fillStyle='rgba(255,255,255,0.22)';
   ctx.textAlign='center';
-  ctx.fillText(`${stampDate} · lockscreenfx.com`, W/2, H-Math.round(30*r));
+  const safeBottom = Math.round(H*0.905);  // above iOS torch/camera icon bar
+  ctx.fillText(`${stampDate} · lockscreenfx.com`, W/2, safeBottom-Math.round(10*r));
 
-  let bottomY = H - Math.round(30*r) - fStamp - Math.round(20*r);
+  let bottomY = safeBottom - Math.round(10*r) - fStamp - Math.round(20*r);
 
   // Footer text above stamp
   if(footerVal){
