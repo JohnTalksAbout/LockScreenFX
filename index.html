@@ -1497,6 +1497,7 @@ async function renderToCanvas(){
   const showPhCheck   = document.getElementById('show-phrases').checked;
   const footerPreCheck= document.getElementById('footer-text').value.trim();
   const maxRows = largeText ? 8 : currentRows;
+  let curY = Math.round(H*0.33);  // clear iOS clock — declared here so availH calc can use it
 
   // Dynamically calculate row height so table never overlaps phrases/footer
   // Bottom block: stamp(26+30) + optional footer(34+16+20) + phrases(label+lines) + separator+margins
@@ -1515,8 +1516,7 @@ async function renderToCanvas(){
   const availH = H - curY - subAndHdrH - bottomBlockH;
   const rowH = Math.max(Math.round(availH / maxRows), Math.round(fNum * 1.15));
 
-  // ── Vertical layout — work top-down from clock clearance
-  let curY = Math.round(H*0.33);  // clear iOS clock (date+time ~33% of screen)
+  // ── Vertical layout — work top-down from clock clearance (curY declared above)
 
   const titleVal   = document.getElementById('wp-title').value.trim();
   const footerValCheck = footerPreCheck;  // already read above for rowH calc
