@@ -712,15 +712,38 @@ Excuse me: Khor thot (kor-tot)</textarea>
       <div class="card-title">📱 Device Type</div>
       <div class="field">
         <select id="device" onchange="renderPreview()">
-          <option value="iphone17_pro">iPhone 17 / 17 Air / 17 Pro (1206×2622px) ✦ Latest</option>
-          <option value="iphone17_max">iPhone 17 Pro Max (1320×2868px) ✦ Latest</option>
-          <option value="iphone16_pro">iPhone 16 Pro (1206×2622px)</option>
-          <option value="iphone16">iPhone 16 / 16 Plus (1290×2796px)</option>
-          <option value="iphone16_max">iPhone 16 Pro Max (1320×2868px)</option>
-          <option value="iphone" selected>iPhone 13 / 14 / 15 Pro (1170×2532px)</option>
-          <option value="iphone_max">iPhone 14/15 Pro Max (1290×2796px)</option>
-          <option value="samsung">Samsung Galaxy S/Ultra (1080×2340px)</option>
-          <option value="pixel">Google Pixel (1080×2400px)</option>
+          <optgroup label="─── iPhone 17 (2025) ───">
+          <option value="sz_1320_2868">iPhone 17 Pro Max (1320×2868)</option>
+          <option value="sz_1260_2736">iPhone 17 Air (1260×2736)</option>
+          <option value="sz_1206_2622">iPhone 17 / 17 Pro (1206×2622)</option>
+          </optgroup>
+          <optgroup label="─── iPhone 16 (2024) ───">
+          <option value="sz_1320_2868">iPhone 16 Pro Max (1320×2868)</option>
+          <option value="sz_1290_2796">iPhone 16 Plus (1290×2796)</option>
+          <option value="sz_1206_2622">iPhone 16 Pro (1206×2622)</option>
+          <option value="sz_1179_2556">iPhone 16 (1179×2556)</option>
+          </optgroup>
+          <optgroup label="─── iPhone 15 (2023) ───">
+          <option value="sz_1290_2796">iPhone 15 Plus / 15 Pro Max (1290×2796)</option>
+          <option value="sz_1179_2556">iPhone 15 / 15 Pro (1179×2556)</option>
+          </optgroup>
+          <optgroup label="─── iPhone 14 (2022) ───">
+          <option value="sz_1290_2796">iPhone 14 Plus / 14 Pro Max (1290×2796)</option>
+          <option value="sz_1170_2532">iPhone 14 / 14 Pro (1170×2532)</option>
+          </optgroup>
+          <optgroup label="─── iPhone 13 / 12 (2020–2021) ───">
+          <option value="sz_1284_2778">iPhone 13 Pro Max / 12 Pro Max (1284×2778)</option>
+          <option value="sz_1170_2532" selected>iPhone 13 / 13 Pro / 12 / 12 Pro (1170×2532)</option>
+          <option value="sz_1080_2340">iPhone 13 mini / 12 mini (1080×2340)</option>
+          </optgroup>
+          <optgroup label="─── Older iPhones ───">
+          <option value="sz_1125_2436">iPhone 11 Pro / XS / X (1125×2436)</option>
+          <option value="sz_828_1792">iPhone 11 / XR (828×1792)</option>
+          </optgroup>
+          <optgroup label="─── Android ───">
+          <option value="samsung">Samsung Galaxy S/Ultra (1080×2340)</option>
+          <option value="pixel">Google Pixel (1080×2400)</option>
+          </optgroup>
         </select>
       </div>
     </div>
@@ -1013,13 +1036,27 @@ const BG_CSS={
   night: 'linear-gradient(180deg,#000005,#050020 40%,#020015)',
 };
 const DEVICE_SIZES={
-  iphone17_pro: {w:1206,h:2622},   // iPhone 17, 17 Air, 17 Pro
-  iphone17_max: {w:1320,h:2868},   // iPhone 17 Pro Max
-  iphone16_pro: {w:1206,h:2622},   // iPhone 16 Pro
-  iphone16:     {w:1290,h:2796},   // iPhone 16, 16 Plus
-  iphone16_max: {w:1320,h:2868},   // iPhone 16 Pro Max
-  iphone:       {w:1170,h:2532},   // iPhone 13/14/15 Pro
-  iphone_max:   {w:1290,h:2796},   // iPhone 14/15 Pro Max
+  // 1320×2868 — iPhone 17 Pro Max, 16 Pro Max
+  sz_1320_2868: {w:1320,h:2868},
+  // 1260×2736 — iPhone 17 Air
+  sz_1260_2736: {w:1260,h:2736},
+  // 1206×2622 — iPhone 17, 17 Pro, 16 Pro
+  sz_1206_2622: {w:1206,h:2622},
+  // 1290×2796 — iPhone 16 Plus, 15 Plus, 15 Pro Max, 14 Plus, 14 Pro Max
+  sz_1290_2796: {w:1290,h:2796},
+  // 1284×2778 — iPhone 13 Pro Max, 12 Pro Max
+  sz_1284_2778: {w:1284,h:2778},
+  // 1179×2556 — iPhone 16, 15, 15 Pro
+  sz_1179_2556: {w:1179,h:2556},
+  // 1170×2532 — iPhone 14, 14 Pro, 13, 13 Pro, 12, 12 Pro  ← most common
+  sz_1170_2532: {w:1170,h:2532},
+  // 1080×2340 — iPhone 13 mini, 12 mini
+  sz_1080_2340: {w:1080,h:2340},
+  // 1125×2436 — iPhone 11 Pro, XS, X
+  sz_1125_2436: {w:1125,h:2436},
+  // 828×1792  — iPhone 11, XR
+  sz_828_1792:  {w:828, h:1792},
+  // Android
   samsung:      {w:1080,h:2340},
   pixel:        {w:1080,h:2400},
 };
@@ -1350,7 +1387,7 @@ async function downloadWallpaper(){
   const btn=document.getElementById('dl-btn');
   btn.textContent='⏳ Generating…'; btn.disabled=true;
   const deviceVal=document.getElementById('device').value;
-  const isAndroid=deviceVal==='samsung'||deviceVal==='pixel';
+  const isAndroid=['samsung','pixel'].includes(deviceVal);
   try{
     const canvas=await renderToCanvas();
     const home=document.getElementById('home-cur').value;
@@ -1456,13 +1493,31 @@ async function renderToCanvas(){
   const fFee    = Math.round(28*r);   // fee note
   const fFooter = Math.round(34*r);   // footer
 
-  const rowH    = largeText ? Math.round(H*0.072) : Math.round(H*0.058);
   const maxRows = largeText ? 8 : currentRows;
 
+  // Dynamically calculate row height so table never overlaps phrases/footer
+  // Bottom block: stamp(26+30) + optional footer(34+16+20) + phrases(label+lines) + separator+margins
+  const showPhCheck = document.getElementById('show-phrases').checked;
+  const phLinesCount = showPhCheck ? document.getElementById('phrases').value.trim().split('\n').filter(l=>l.trim()).length : 0;
+  const clampedPhLines = Math.min(phLinesCount, largeText?3:5);
+  const bottomBlockH = Math.round(r*(
+    30 + fStamp +                                          // stamp
+    20 +                                                   // gap above stamp
+    (footerValCheck ? fFooter + 16 + 20 : 0) +           // optional footer
+    (showPhCheck && phLinesCount>0 ?
+      20 + fPhrLbl + 14 + clampedPhLines*(fPhrTxt+8) + 20  // phrases block
+      : 0)
+  ));
+  // Height available for subtitle+header+rows
+  const subAndHdrH = fSub + 14 + 24 + fHdr + 12 + 16;  // subtitle+gaps+header+sep+gap
+  const availH = H - curY - subAndHdrH - bottomBlockH;
+  const rowH = Math.max(Math.round(availH / maxRows), Math.round(fNum * 1.15));
+
   // ── Vertical layout — work top-down from clock clearance
-  let curY = Math.round(H*0.36);  // clear iOS clock
+  let curY = Math.round(H*0.33);  // clear iOS clock (date+time ~33% of screen)
 
   const titleVal   = document.getElementById('wp-title').value.trim();
+  const footerValCheck = document.getElementById('footer-text').value.trim();
   const titleColor = document.getElementById('c-title').value;
   const textColor  = document.getElementById('c-text').value;
   const rateColor  = document.getElementById('c-rate').value;
