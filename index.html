@@ -318,6 +318,21 @@ input[type=range] { width:100%; accent-color:var(--accent); margin-top:6px; curs
 }
 .phone-screen { border-radius:44px; overflow:hidden; }
 
+/* ── Mobile: scale preview down to a compact teaser, scroll naturally with page */
+@media(max-width:900px){
+  .preview-col {
+    position:static;   /* no more sticky — scrolls with page */
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .phone-outer {
+    transform:scale(0.62);
+    transform-origin:top center;
+    margin-bottom:-206px; /* pull up dead space: shell ~580px, scaled 62%, dead = 220px minus original 14px margin */
+  }
+}
+
 /* ══════════════════════════════════════════
    WALLPAPER CANVAS  — this is what gets captured
 ══════════════════════════════════════════ */
