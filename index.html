@@ -277,6 +277,29 @@ input[type=range] { width:100%; accent-color:var(--accent); margin-top:6px; curs
 .dl-btn:hover { background:rgba(16,185,129,0.15); border-color:var(--green); }
 
 /* tip section */
+/* ── How-to steps card */
+.howto-card {
+  display:none; margin-top:14px;
+  background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2);
+  border-radius:var(--r); padding:16px 18px;
+}
+.howto-card.show { display:block; }
+.howto-heading { font-size:0.78rem; font-weight:700; color:var(--green); margin-bottom:10px; letter-spacing:0.02em; }
+.howto-step {
+  display:flex; align-items:flex-start; gap:10px;
+  font-size:0.76rem; color:var(--text2); line-height:1.45; margin-bottom:7px;
+}
+.howto-step:last-child { margin-bottom:0; }
+.howto-step strong { color:var(--text1); }
+.howto-num {
+  min-width:20px; height:20px; border-radius:50%;
+  background:rgba(16,185,129,0.15); color:var(--green);
+  font-size:0.65rem; font-weight:700; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; margin-top:1px;
+}
+.howto-ios, .howto-android { display:none; }
+.howto-ios.show, .howto-android.show { display:block; }
+
 .tip-card {
   display:none; margin-top:12px;
   background:linear-gradient(135deg,rgba(245,158,11,0.05),rgba(59,130,246,0.05));
@@ -345,14 +368,9 @@ input[type=range] { width:100%; accent-color:var(--accent); margin-top:6px; curs
 #wp-ov    { position:absolute; inset:0; }
 #wp-body  { position:absolute; inset:0; display:flex; flex-direction:column; }
 
-/* clock */
-.wp-clock { padding:36px 18px 8px; text-align:center; flex-shrink:0; }
-.wp-clk-date { font-size:9.5px; color:rgba(255,255,255,0.8); letter-spacing:0.05em; margin-bottom:1px; }
-.wp-clk-time { font-size:52px; font-weight:300; color:#fff; letter-spacing:-3px; line-height:1; text-shadow:0 2px 16px rgba(0,0,0,0.5); }
-
 /* panel */
 .wp-panel {
-  flex:1; margin:4px 9px 9px;
+  flex:1; margin:9px 9px 9px;
   background:rgba(0,0,0,0.52); border-radius:13px;
   border:1px solid rgba(255,255,255,0.07);
   padding:11px 12px 9px;
@@ -710,6 +728,23 @@ Excuse me: Khor thot (kor-tot)</textarea>
     <button class="gen-btn" onclick="generateWallpaper()">✦ Generate Wallpaper</button>
     <button class="dl-btn" id="dl-btn" onclick="downloadWallpaper()">⬇ Save to Photos</button>
 
+    <!-- How-to steps (shown after download, iOS only) -->
+    <div class="howto-card" id="howto-card">
+      <div class="howto-heading">📱 How to set your lock screen</div>
+      <div class="howto-ios" id="howto-ios">
+        <div class="howto-step"><span class="howto-num">1</span>Tap <strong>Open</strong> when Safari asks — the image opens full screen</div>
+        <div class="howto-step"><span class="howto-num">2</span>Tap the <strong>Share</strong> button (box with arrow) at the bottom</div>
+        <div class="howto-step"><span class="howto-num">3</span>Tap <strong>Save Image</strong> — it lands in your Photos app</div>
+        <div class="howto-step"><span class="howto-num">4</span>Go to <strong>Settings → Wallpaper → Add New</strong> → choose from Photos</div>
+        <div class="howto-step"><span class="howto-num">5</span>Select the image → tap <strong>Set</strong> → <strong>Lock Screen</strong></div>
+      </div>
+      <div class="howto-android" id="howto-android">
+        <div class="howto-step"><span class="howto-num">1</span>The wallpaper has downloaded to your <strong>Gallery / Downloads</strong></div>
+        <div class="howto-step"><span class="howto-num">2</span>Go to <strong>Settings → Wallpaper</strong></div>
+        <div class="howto-step"><span class="howto-num">3</span>Choose <strong>My photos</strong> → select the image → set as <strong>Lock screen</strong></div>
+      </div>
+    </div>
+
     <!-- Tip (shown after download only) -->
     <div class="tip-card" id="tip-card">
       <h4>☕ If this saved you headaches on your travels…</h4>
@@ -735,10 +770,6 @@ Excuse me: Khor thot (kor-tot)</textarea>
             <div id="wp-bg"></div>
             <div id="wp-ov"></div>
             <div id="wp-body">
-              <div class="wp-clock">
-                <div class="wp-clk-date" id="wp-clk-date">Thursday 26 February</div>
-                <div class="wp-clk-time" id="wp-clk-time">12:00</div>
-              </div>
               <div class="wp-panel">
                 <div class="wp-panel-title" id="wp-p-title" style="display:none"></div>
                 <div class="wp-panel-sub"   id="wp-p-sub">THB → GBP</div>
@@ -1108,11 +1139,6 @@ function renderPreview(){
   const dlBtn=document.getElementById('dl-btn');
   dlBtn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos';
 
-  // Clock
-  const now=new Date();
-  document.getElementById('wp-clk-time').textContent=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
-  document.getElementById('wp-clk-date').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-
   // Large text class
   const wp=document.getElementById('wp');
   largeText=document.getElementById('large-text').checked;
@@ -1309,6 +1335,17 @@ function generateWallpaper(){
   btn.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
+function fallbackDownload(blob, filename){
+  const blobUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = blobUrl;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(()=>URL.revokeObjectURL(blobUrl), 5000);
+}
+
 async function downloadWallpaper(){
   const btn=document.getElementById('dl-btn');
   btn.textContent='⏳ Generating…'; btn.disabled=true;
@@ -1316,28 +1353,46 @@ async function downloadWallpaper(){
     const el=document.getElementById('wp');
     const deviceVal=document.getElementById('device').value;
     const size=DEVICE_SIZES[deviceVal];
-    const scale=Math.min(size.w/262, 3.5); // clamped — prevents blank exports on older phones
+    // Scale to target device resolution. Max canvas is ~3.15MP at 4.6× — safe on all modern phones.
+    // Old 3.5× clamp was causing half-width output on iPhones — raised to 4.6×
+    const scale=Math.min(size.w/262, 4.6);
     const canvas=await html2canvas(el,{
       scale:scale, useCORS:true, allowTaint:true,
       backgroundColor:null, logging:false, width:262, height:568,
+      foreignObjectRendering:false,  // prevents WebKit double-paint ghost text
+      imageTimeout:15000,
     });
+
     const home=document.getElementById('home-cur').value;
     const dest=document.getElementById('dest-cur').value;
     const filename=`lockscreenfx-${dest}-${home}.png`;
     const isAndroid=deviceVal==='samsung'||deviceVal==='pixel';
     // Blob URL required for iOS Safari — data: URLs do not save to Photos
-    canvas.toBlob(function(blob){
-      const blobUrl=URL.createObjectURL(blob);
-      const link=document.createElement('a');
-      link.download=filename;
-      link.href=blobUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(()=>URL.revokeObjectURL(blobUrl), 5000);
-      btn.textContent=isAndroid?'✓ Downloaded! Set as lock screen in Settings.':'✓ Image saved — open your Files app to set as lock screen.';
+    canvas.toBlob(async function(blob){
+      const file = new File([blob], filename, {type:'image/png'});
+
+      // iOS: try Web Share API first — opens native share sheet, user taps Save Image
+      if(!isAndroid && navigator.canShare && navigator.canShare({files:[file]})){
+        try{
+          await navigator.share({files:[file], title:'LockScreenFX Wallpaper'});
+        }catch(shareErr){
+          // AbortError = user cancelled share sheet — don't fallback to download
+          if(shareErr.name !== 'AbortError') fallbackDownload(blob, filename);
+        }
+      } else {
+        // Android + desktop: standard blob download
+        fallbackDownload(blob, filename);
+      }
+
+      // Show how-to steps
+      const howto = document.getElementById('howto-card');
+      howto.classList.add('show');
+      document.getElementById('howto-ios').classList.toggle('show', !isAndroid);
+      document.getElementById('howto-android').classList.toggle('show', isAndroid);
+
+      btn.textContent=isAndroid?'✓ Downloaded!':'✓ Tap Save Image in the share sheet!';
       document.getElementById('tip-card').classList.add('show');
-      document.getElementById('tip-card').scrollIntoView({behavior:'smooth',block:'nearest'});
+      howto.scrollIntoView({behavior:'smooth',block:'nearest'});
       saveSettings();
       setTimeout(()=>{
         btn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos';
@@ -1455,11 +1510,6 @@ function restoreUIState(s){
     document.getElementById('dir-label').innerHTML='<span class="dir-main">Your Currency → Destination</span><span class="dir-sub">(budgeting &amp; withdrawals) · Fees reduce what you receive.</span>';
   }
 }
-setInterval(()=>{
-  const el=document.getElementById('wp-clk-time');
-  if(el) el.textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
-},30000);
-
 /* ═══════════════════════════════════════════
    BOOT
 ═══════════════════════════════════════════ */
