@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="Free travel currency lock screen wallpaper generator by John TalksAbout. Know what you pay, everywhere.">
 <meta name="theme-color" content="#0b1120">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LockScreenFX">
 <title>LockScreenFX — Travel Currency Lock Screen Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" rel="stylesheet">
@@ -1836,6 +1840,15 @@ document.getElementById('nl-form').addEventListener('submit', function(e){
 document.getElementById('nl-consent').addEventListener('change', function(){
   if(this.checked) document.getElementById('nl-error').style.display='none';
 });
+
+// ── PWA Service Worker registration
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(()=>console.log('LockScreenFX SW registered'))
+      .catch(err=>console.warn('SW registration failed:',err));
+  });
+}
 </script>
 </body>
 </html>
