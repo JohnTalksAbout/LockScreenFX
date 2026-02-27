@@ -1321,19 +1321,32 @@ async function downloadWallpaper(){
       scale:scale, useCORS:true, allowTaint:true,
       backgroundColor:null, logging:false, width:262, height:568,
     });
-    const link=document.createElement('a');
     const home=document.getElementById('home-cur').value;
     const dest=document.getElementById('dest-cur').value;
-    link.download=`lockscreenfx-${dest}-${home}.png`;
-    link.href=canvas.toDataURL('image/png',1.0);
-    link.click();
+    const filename=`lockscreenfx-${dest}-${home}.png`;
     const isAndroid=deviceVal==='samsung'||deviceVal==='pixel';
-    btn.textContent=isAndroid?'✓ Downloaded! Set as lock screen in Settings.':'✓ Saved! Set as lock screen in Photos.';
-    document.getElementById('tip-card').classList.add('show');
-    document.getElementById('tip-card').scrollIntoView({behavior:'smooth',block:'nearest'});
-    saveSettings();
+    // Blob URL required for iOS Safari — data: URLs do not save to Photos
+    canvas.toBlob(function(blob){
+      const blobUrl=URL.createObjectURL(blob);
+      const link=document.createElement('a');
+      link.download=filename;
+      link.href=blobUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(()=>URL.revokeObjectURL(blobUrl), 5000);
+      btn.textContent=isAndroid?'✓ Downloaded! Set as lock screen in Settings.':'✓ Image saved — open your Files app to set as lock screen.';
+      document.getElementById('tip-card').classList.add('show');
+      document.getElementById('tip-card').scrollIntoView({behavior:'smooth',block:'nearest'});
+      saveSettings();
+      setTimeout(()=>{
+        btn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos';
+        btn.disabled=false;
+      },5000);
+    },'image/png',1.0);
+    return; // early return — button reset handled inside toBlob callback
   }catch(err){
-    btn.textContent='⚠ Failed — right-click the preview to save';
+    btn.textContent='⚠ Failed — long-press the preview image to save';
     console.error(err);
   }
   setTimeout(()=>{
