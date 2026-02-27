@@ -717,7 +717,7 @@ Excuse me: Khor thot (kor-tot)</textarea>
           <option value="iphone16_pro">iPhone 16 Pro (1206×2622px)</option>
           <option value="iphone16">iPhone 16 / 16 Plus (1290×2796px)</option>
           <option value="iphone16_max">iPhone 16 Pro Max (1320×2868px)</option>
-          <option value="iphone">iPhone 13 / 14 / 15 Pro (1170×2532px)</option>
+          <option value="iphone" selected>iPhone 13 / 14 / 15 Pro (1170×2532px)</option>
           <option value="iphone_max">iPhone 14/15 Pro Max (1290×2796px)</option>
           <option value="samsung">Samsung Galaxy S/Ultra (1080×2340px)</option>
           <option value="pixel">Google Pixel (1080×2400px)</option>
@@ -1356,11 +1356,16 @@ async function downloadWallpaper(){
     // Scale to target device resolution. Max canvas is ~3.15MP at 4.6× — safe on all modern phones.
     // Old 3.5× clamp was causing half-width output on iPhones — raised to 4.6×
     const scale=Math.min(size.w/262, 4.6);
+    await document.fonts.ready;
     const canvas=await html2canvas(el,{
       scale:scale, useCORS:true, allowTaint:true,
       backgroundColor:null, logging:false, width:262, height:568,
-      foreignObjectRendering:false,  // prevents WebKit double-paint ghost text
+      foreignObjectRendering:false,
       imageTimeout:15000,
+      onclone:(clonedDoc)=>{
+        const wpEl=clonedDoc.getElementById('wp');
+        if(wpEl) wpEl.style.fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
+      }
     });
 
     const home=document.getElementById('home-cur').value;
