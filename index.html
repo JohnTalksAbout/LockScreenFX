@@ -368,9 +368,9 @@ input[type=range] { width:100%; accent-color:var(--accent); margin-top:6px; curs
 #wp-ov    { position:absolute; inset:0; }
 #wp-body  { position:absolute; inset:0; display:flex; flex-direction:column; }
 
-/* panel */
+/* panel — pushed down to clear iOS clock zone (top 36% of screen) */
 .wp-panel {
-  flex:1; margin:9px 9px 9px;
+  flex:1; margin:204px 9px 9px;
   background:rgba(0,0,0,0.52); border-radius:13px;
   border:1px solid rgba(255,255,255,0.07);
   padding:11px 12px 9px;
@@ -1349,71 +1349,254 @@ function fallbackDownload(blob, filename){
 async function downloadWallpaper(){
   const btn=document.getElementById('dl-btn');
   btn.textContent='⏳ Generating…'; btn.disabled=true;
+  const deviceVal=document.getElementById('device').value;
+  const isAndroid=deviceVal==='samsung'||deviceVal==='pixel';
   try{
-    const el=document.getElementById('wp');
-    const deviceVal=document.getElementById('device').value;
-    const size=DEVICE_SIZES[deviceVal];
-    // Scale to target device resolution. Max canvas is ~3.15MP at 4.6× — safe on all modern phones.
-    // Old 3.5× clamp was causing half-width output on iPhones — raised to 4.6×
-    const scale=Math.min(size.w/262, 4.6);
-    await document.fonts.ready;
-    const canvas=await html2canvas(el,{
-      scale:scale, useCORS:true, allowTaint:true,
-      backgroundColor:null, logging:false, width:262, height:568,
-      foreignObjectRendering:false,
-      imageTimeout:15000,
-      onclone:(clonedDoc)=>{
-        const wpEl=clonedDoc.getElementById('wp');
-        if(wpEl) wpEl.style.fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
-      }
-    });
-
+    const canvas=await renderToCanvas();
     const home=document.getElementById('home-cur').value;
     const dest=document.getElementById('dest-cur').value;
     const filename=`lockscreenfx-${dest}-${home}.png`;
-    const isAndroid=deviceVal==='samsung'||deviceVal==='pixel';
-    // Blob URL required for iOS Safari — data: URLs do not save to Photos
     canvas.toBlob(async function(blob){
-      const file = new File([blob], filename, {type:'image/png'});
-
-      // iOS: try Web Share API first — opens native share sheet, user taps Save Image
-      if(!isAndroid && navigator.canShare && navigator.canShare({files:[file]})){
-        try{
-          await navigator.share({files:[file], title:'LockScreenFX Wallpaper'});
-        }catch(shareErr){
-          // AbortError = user cancelled share sheet — don't fallback to download
-          if(shareErr.name !== 'AbortError') fallbackDownload(blob, filename);
-        }
-      } else {
-        // Android + desktop: standard blob download
-        fallbackDownload(blob, filename);
-      }
-
-      // Show how-to steps
-      const howto = document.getElementById('howto-card');
+      const file=new File([blob],filename,{type:'image/png'});
+      if(!isAndroid&&navigator.canShare&&navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file],title:'LockScreenFX Wallpaper'}); }
+        catch(e){ if(e.name!=='AbortError') fallbackDownload(blob,filename); }
+      } else { fallbackDownload(blob,filename); }
+      const howto=document.getElementById('howto-card');
       howto.classList.add('show');
-      document.getElementById('howto-ios').classList.toggle('show', !isAndroid);
-      document.getElementById('howto-android').classList.toggle('show', isAndroid);
-
+      document.getElementById('howto-ios').classList.toggle('show',!isAndroid);
+      document.getElementById('howto-android').classList.toggle('show',isAndroid);
       btn.textContent=isAndroid?'✓ Downloaded!':'✓ Tap Save Image in the share sheet!';
       document.getElementById('tip-card').classList.add('show');
       howto.scrollIntoView({behavior:'smooth',block:'nearest'});
       saveSettings();
-      setTimeout(()=>{
-        btn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos';
-        btn.disabled=false;
-      },5000);
+      setTimeout(()=>{ btn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos'; btn.disabled=false; },5000);
     },'image/png',1.0);
-    return; // early return — button reset handled inside toBlob callback
+    return;
   }catch(err){
-    btn.textContent='⚠ Failed — long-press the preview image to save';
+    btn.textContent='⚠ Failed — try again';
     console.error(err);
   }
-  setTimeout(()=>{
-    const isAndroid=document.getElementById('device').value==='samsung'||document.getElementById('device').value==='pixel';
-    btn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos';
-    btn.disabled=false;
-  },4000);
+  setTimeout(()=>{ btn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos'; btn.disabled=false; },4000);
+}
+
+/* ═══════════════════════════════════════════
+   CANVAS 2D RENDERER — replaces html2canvas
+   Draws the wallpaper natively — no DOM capture,
+   no font loading race, no ghost text on iOS.
+═══════════════════════════════════════════ */
+async function renderToCanvas(){
+  const homeCode=document.getElementById('home-cur').value;
+  const destCode=document.getElementById('dest-cur').value;
+  const homeCur=CURRENCIES.find(c=>c.code===homeCode);
+  const destCur=CURRENCIES.find(c=>c.code===destCode);
+  const deviceVal=document.getElementById('device').value;
+  const size=DEVICE_SIZES[deviceVal];
+  const W=size.w, H=size.h;
+
+  const canvas=document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // ── Background gradient
+  const bgKey=currentBg;
+  const BG_STOPS={
+    ocean: [[0,'#020d1a'],[0.5,'#0a2040'],[1,'#051226']],
+    sunset:[[0,'#1a0800'],[0.4,'#7c1f00'],[0.7,'#c43a00'],[1,'#1a0800']],
+    forest:[[0,'#020a02'],[0.5,'#0a2010'],[1,'#041208']],
+    purple:[[0,'#0d0020'],[0.5,'#2d0060'],[1,'#150030']],
+    slate: [[0,'#0a0c10'],[0.5,'#1a2030'],[1,'#0d1018']],
+    rose:  [[0,'#1a020a'],[0.5,'#4a0820'],[1,'#200510']],
+    beach: [[0,'#001a2e'],[0.4,'#003d5c'],[0.6,'#006080'],[1,'#004a60']],
+    city:  [[0,'#050510'],[0.6,'#0d0d2e'],[1,'#050510']],
+    jungle:[[0,'#011002'],[0.4,'#052010'],[1,'#0a3015']],
+    desert:[[0,'#200c00'],[0.5,'#5a2a00'],[0.7,'#804000'],[1,'#3a1800']],
+    night: [[0,'#000005'],[0.4,'#050020'],[1,'#020015']],
+  };
+
+  if(bgKey==='custom'&&customBgUrl){
+    await new Promise(res=>{
+      const img=new Image();
+      img.onload=()=>{ ctx.drawImage(img,0,0,W,H); res(); };
+      img.onerror=res;
+      img.src=customBgUrl;
+    });
+  } else {
+    const stops=BG_STOPS[bgKey]||BG_STOPS.ocean;
+    const grad=ctx.createLinearGradient(0,0,0,H);
+    stops.forEach(([pos,col])=>grad.addColorStop(pos,col));
+    ctx.fillStyle=grad;
+    ctx.fillRect(0,0,W,H);
+  }
+
+  // ── Overlay
+  const ov=parseInt(document.getElementById('ov-slider').value)/100;
+  ctx.fillStyle=`rgba(0,0,0,${ov})`;
+  ctx.fillRect(0,0,W,H);
+
+  // ── Layout constants (scaled to canvas size)
+  const s=W/390; // scale factor relative to 390px reference width
+  const pad=W*0.07;
+  const panelX=pad;
+  const panelW=W-pad*2;
+
+  // ── Start content BELOW iOS lock screen clock zone (top ~34% of screen)
+  // This prevents the conversion table from sitting behind the time/date display
+  const clockClearance=H*0.36;
+
+  // ── Title (if set)
+  const titleVal=document.getElementById('wp-title').value.trim();
+  const titleColor=document.getElementById('c-title').value;
+  let curY=clockClearance;
+
+  if(titleVal){
+    ctx.font=`700 ${Math.round(38*s)}px -apple-system,system-ui,sans-serif`;
+    ctx.fillStyle=titleColor;
+    ctx.textAlign='center';
+    ctx.fillText(titleVal,W/2,curY+Math.round(38*s));
+    curY+=Math.round(56*s);
+  } else {
+    curY+=Math.round(20*s);
+  }
+
+  // ── Subtitle: flag + currency pair
+  const fromCode=dirFlipped?homeCode:destCode;
+  const toCode=dirFlipped?destCode:homeCode;
+  const fromCur=dirFlipped?homeCur:destCur;
+  const toCur=dirFlipped?destCur:homeCur;
+  const subText=`${fromCur.flag} ${fromCode}  →  ${toCur.flag} ${toCode}`;
+  ctx.font=`500 ${Math.round(26*s)}px -apple-system,system-ui,sans-serif`;
+  ctx.fillStyle='rgba(255,255,255,0.85)';
+  ctx.textAlign='center';
+  ctx.fillText(subText,W/2,curY);
+  curY+=Math.round(34*s);
+
+  // ── FX fee note
+  const fee=getEffectiveFee();
+  if(fee>0){
+    ctx.font=`400 ${Math.round(18*s)}px -apple-system,system-ui,sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.textAlign='center';
+    ctx.fillText(`incl. ${fee}% card fee`,W/2,curY);
+    curY+=Math.round(26*s);
+  }
+
+  // ── Panel box
+  const panelTopY=curY+Math.round(12*s);
+  const textColor=document.getElementById('c-text').value;
+  const rateColor=document.getElementById('c-rate').value;
+
+  // ── Conversion table
+  const maxRows=largeText?8:currentRows;
+  const baseCode=dirFlipped?homeCode:destCode;
+  const amounts=getLadder(baseCode,currentLadder).slice(0,maxRows);
+  const rawRate=getRate(homeCode,destCode);
+  const feeMultiplier=1+(fee/100);
+
+  const rowH=Math.round(H*0.048);
+  const headerH=Math.round(rowH*0.8);
+  const colMid=W/2;
+  const colLeft=colMid-Math.round(30*s);
+  const colRight=colMid+Math.round(30*s);
+
+  // Header row
+  const hdrFontSz=Math.round(16*s);
+  ctx.font=`600 ${hdrFontSz}px -apple-system,system-ui,sans-serif`;
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.textAlign='right';
+  ctx.fillText(`${fromCur.flag} ${fromCode}`,colLeft-Math.round(10*s),panelTopY+headerH);
+  ctx.fillStyle=rateColor;
+  ctx.textAlign='left';
+  ctx.fillText(`${toCur.flag} ${toCode}`,colRight+Math.round(10*s),panelTopY+headerH);
+
+  // Separator line under header
+  ctx.strokeStyle='rgba(255,255,255,0.12)';
+  ctx.lineWidth=Math.round(1*s);
+  ctx.beginPath();
+  ctx.moveTo(panelX,panelTopY+headerH+Math.round(8*s));
+  ctx.lineTo(panelX+panelW,panelTopY+headerH+Math.round(8*s));
+  ctx.stroke();
+
+  let tableY=panelTopY+headerH+Math.round(16*s);
+  const numFontSz=largeText?Math.round(32*s):Math.round(26*s);
+
+  amounts.forEach((amt,i)=>{
+    let converted='—';
+    if(rawRate!==null){
+      const raw=dirFlipped?amt*rawRate:amt/rawRate;
+      const withFee=dirFlipped?raw/feeMultiplier:raw*feeMultiplier;
+      converted=fmtNum(doRound(withFee,currentRound));
+    }
+    // Separator
+    if(i>0){
+      ctx.strokeStyle='rgba(255,255,255,0.07)';
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(panelX,tableY-Math.round(4*s));
+      ctx.lineTo(panelX+panelW,tableY-Math.round(4*s));
+      ctx.stroke();
+    }
+    ctx.font=`400 ${numFontSz}px -apple-system,system-ui,sans-serif`;
+    ctx.fillStyle=textColor;
+    ctx.globalAlpha=0.72;
+    ctx.textAlign='right';
+    ctx.fillText(amt.toLocaleString(),colLeft-Math.round(10*s),tableY+numFontSz*0.75);
+    ctx.globalAlpha=1;
+    ctx.fillStyle='rgba(255,255,255,0.22)';
+    ctx.font=`300 ${Math.round(20*s)}px -apple-system,system-ui,sans-serif`;
+    ctx.textAlign='center';
+    ctx.fillText('→',colMid,tableY+numFontSz*0.75);
+    ctx.font=`600 ${numFontSz}px -apple-system,system-ui,sans-serif`;
+    ctx.fillStyle=rateColor;
+    ctx.textAlign='left';
+    ctx.fillText(String(converted),colRight+Math.round(10*s),tableY+numFontSz*0.75);
+    tableY+=rowH;
+  });
+
+  // ── Essential phrases
+  const showPh=document.getElementById('show-phrases').checked;
+  const phText=document.getElementById('phrases').value.trim();
+  if(showPh&&phText){
+    const lines=phText.split('\n').filter(l=>l.trim()).slice(0,largeText?3:5);
+    const phY=H-Math.round((lines.length*28+60)*s);
+    // Separator
+    ctx.strokeStyle='rgba(255,255,255,0.12)';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(panelX,phY);
+    ctx.lineTo(panelX+panelW,phY);
+    ctx.stroke();
+    ctx.font=`700 ${Math.round(14*s)}px -apple-system,system-ui,sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.35)';
+    ctx.textAlign='center';
+    ctx.letterSpacing=`${Math.round(2*s)}px`;
+    ctx.fillText('ESSENTIAL PHRASES',W/2,phY+Math.round(24*s));
+    ctx.letterSpacing='0px';
+    ctx.font=`400 ${Math.round(18*s)}px -apple-system,system-ui,sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.7)';
+    lines.forEach((l,i)=>{
+      ctx.fillText(l.trim(),W/2,phY+Math.round(24*s)+Math.round((i+1)*28*s));
+    });
+  }
+
+  // ── Footer
+  const footerVal=document.getElementById('footer-text').value.trim();
+  const footerColor=document.getElementById('c-foot').value;
+  if(footerVal){
+    ctx.font=`500 ${Math.round(20*s)}px -apple-system,system-ui,sans-serif`;
+    ctx.fillStyle=footerColor;
+    ctx.textAlign='center';
+    ctx.fillText(footerVal,W/2,H-Math.round(44*s));
+  }
+
+  // ── Stamp
+  const stampDate=ratesUpdatedStr?`Rates captured: ${ratesUpdatedStr}`:'Rates fetching…';
+  ctx.font=`400 ${Math.round(14*s)}px -apple-system,system-ui,sans-serif`;
+  ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.textAlign='center';
+  ctx.fillText(`${stampDate} · lockscreenfx.com`,W/2,H-Math.round(22*s));
+
+  return canvas;
 }
 
 /* ═══════════════════════════════════════════
