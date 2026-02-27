@@ -1493,17 +1493,19 @@ async function renderToCanvas(){
   const fFee    = Math.round(28*r);   // fee note
   const fFooter = Math.round(34*r);   // footer
 
+  // Pre-read values needed for dynamic row height calculation
+  const showPhCheck   = document.getElementById('show-phrases').checked;
+  const footerPreCheck= document.getElementById('footer-text').value.trim();
   const maxRows = largeText ? 8 : currentRows;
 
   // Dynamically calculate row height so table never overlaps phrases/footer
   // Bottom block: stamp(26+30) + optional footer(34+16+20) + phrases(label+lines) + separator+margins
-  const showPhCheck = document.getElementById('show-phrases').checked;
   const phLinesCount = showPhCheck ? document.getElementById('phrases').value.trim().split('\n').filter(l=>l.trim()).length : 0;
   const clampedPhLines = Math.min(phLinesCount, largeText?3:5);
   const bottomBlockH = Math.round(r*(
     30 + fStamp +                                          // stamp
     20 +                                                   // gap above stamp
-    (footerValCheck ? fFooter + 16 + 20 : 0) +           // optional footer
+    (footerPreCheck ? fFooter + 16 + 20 : 0) +           // optional footer
     (showPhCheck && phLinesCount>0 ?
       20 + fPhrLbl + 14 + clampedPhLines*(fPhrTxt+8) + 20  // phrases block
       : 0)
@@ -1517,7 +1519,7 @@ async function renderToCanvas(){
   let curY = Math.round(H*0.33);  // clear iOS clock (date+time ~33% of screen)
 
   const titleVal   = document.getElementById('wp-title').value.trim();
-  const footerValCheck = document.getElementById('footer-text').value.trim();
+  const footerValCheck = footerPreCheck;  // already read above for rowH calc
   const titleColor = document.getElementById('c-title').value;
   const textColor  = document.getElementById('c-text').value;
   const rateColor  = document.getElementById('c-rate').value;
