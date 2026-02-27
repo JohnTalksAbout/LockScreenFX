@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="Free travel currency lock screen wallpaper generator by John TalksAbout. Know what you pay, everywhere.">
+<meta name="theme-color" content="#0b1120">
+<title>LockScreenFX — Travel Currency Lock Screen Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ══════════════════════════════════════════
+   RESET & VARIABLES
+══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #0b1120;
+  --bg2:      #111827;
+  --surface:  #1a2235;
+  --surface2: #1f2b40;
+  --border:   #263044;
+  --border2:  #2e3a52;
+  --accent:   #3b82f6;
+  --accent-h: #60a5fa;
+  --gold:     #f59e0b;
+  --gold-h:   #fbbf24;
+  --green:    #10b981;
+  --red:      #ef4444;
+  --text:     #f1f5f9;
+  --text2:    #94a3b8;
+  --text3:    #64748b;
+  --r:        12px;
+  --r-sm:     8px;
+}
+html { scroll-behavior: smooth; }
+body { font-family:'Outfit',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.5; }
+
+/* ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ */
+.site-header {
+  background:linear-gradient(135deg,#0b1120 0%,#111827 50%,#0d1b2e 100%);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  position:sticky; top:0; z-index:100;
+}
+.header-inner {
+  max-width:1200px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  height:64px; gap:16px;
+}
+.logo-wrap { display:flex; align-items:center; gap:10px; text-decoration:none; }
+.logo-icon {
+  width:36px; height:36px;
+  background:linear-gradient(135deg,var(--accent),#8b5cf6);
+  border-radius:9px; display:flex; align-items:center; justify-content:center;
+  font-size:18px; flex-shrink:0;
+}
+.logo-text { font-size:1.2rem; font-weight:800; color:var(--text); letter-spacing:-0.3px; }
+.logo-text span { color:var(--accent); }
+.header-right { display:flex; align-items:center; gap:8px; }
+.header-link {
+  font-size:0.75rem; font-weight:500; color:var(--text2);
+  text-decoration:none; padding:6px 12px;
+  border-radius:var(--r-sm); border:1px solid var(--border);
+  transition:all 0.2s; white-space:nowrap;
+  display:flex; align-items:center; gap:5px;
+}
+.header-link:hover { color:var(--text); border-color:var(--accent); background:rgba(59,130,246,0.08); }
+.header-link.yt { border-color:rgba(255,0,0,0.3); color:#ff5555; }
+.header-link.yt:hover { background:rgba(255,0,0,0.08); border-color:#ff5555; }
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+.hero {
+  background:linear-gradient(135deg,#0b1120 0%,#0d1b2e 60%,#111827 100%);
+  border-bottom:1px solid var(--border);
+  padding:40px 24px 32px; text-align:center; position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; top:-80px; left:50%; transform:translateX(-50%);
+  width:600px; height:300px;
+  background:radial-gradient(ellipse,rgba(59,130,246,0.07) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-by { font-size:0.72rem; color:var(--text3); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:10px; }
+.hero-by a { color:var(--accent-h); text-decoration:none; font-weight:600; }
+.hero-by a:hover { text-decoration:underline; }
+.hero h1 {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.8rem,5vw,3rem); font-weight:700;
+  color:var(--text); letter-spacing:-0.5px; margin-bottom:10px;
+}
+.hero h1 em {
+  font-style:italic;
+  background:linear-gradient(135deg,var(--accent),#8b5cf6);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.hero-sub { font-size:1rem; color:var(--text2); max-width:520px; margin:0 auto 20px; }
+
+.rate-bar {
+  display:inline-flex; align-items:center; gap:10px;
+  background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2);
+  border-radius:30px; padding:8px 16px;
+}
+.rate-dot { width:6px; height:6px; background:var(--green); border-radius:50%; animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+#rate-status-text { font-size:0.72rem; color:var(--green); font-weight:500; letter-spacing:0.04em; }
+.refresh-btn {
+  font-size:0.72rem; font-weight:600; color:var(--accent-h);
+  background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25);
+  border-radius:20px; padding:5px 12px; cursor:pointer;
+  transition:all 0.2s; white-space:nowrap;
+}
+.refresh-btn:hover { background:rgba(59,130,246,0.18); }
+
+/* ══════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════ */
+.app-wrap {
+  max-width:1200px; margin:0 auto; padding:32px 20px 60px;
+  display:grid; grid-template-columns:1fr 320px; gap:28px; align-items:start;
+}
+@media(max-width:900px) { .app-wrap{grid-template-columns:1fr;} .preview-col{order:-1;} }
+
+/* ══════════════════════════════════════════
+   CARDS / CONTROLS
+══════════════════════════════════════════ */
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r); padding:20px; margin-bottom:14px;
+}
+.card-title {
+  font-size:0.63rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--text3); margin-bottom:16px; display:flex; align-items:center; gap:7px;
+}
+.field { margin-bottom:14px; }
+.field:last-child { margin-bottom:0; }
+.field > label {
+  display:block; font-size:0.75rem; font-weight:500; color:var(--text2); margin-bottom:6px;
+}
+.field-hint { font-size:0.68rem; color:var(--text3); margin-top:4px; }
+
+select, input[type=text], input[type=number], textarea {
+  width:100%; background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--r-sm); color:var(--text); font-family:'Outfit',sans-serif;
+  font-size:0.85rem; padding:10px 14px; outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  -webkit-appearance:none; appearance:none;
+}
+select {
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center; padding-right:36px;
+}
+select:focus,input:focus,textarea:focus {
+  border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,246,0.1);
+}
+textarea { resize:vertical; min-height:80px; line-height:1.6; }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:480px) { .two-col{grid-template-columns:1fr;} }
+
+/* pill button groups */
+.pill-group { display:flex; gap:6px; }
+.pill-group.wrap { flex-wrap:wrap; }
+.pill-btn {
+  flex:1; text-align:center; padding:8px 6px;
+  font-size:0.74rem; font-weight:500;
+  border-radius:var(--r-sm); border:1px solid var(--border2);
+  background:var(--bg2); color:var(--text3); cursor:pointer;
+  transition:all 0.15s; white-space:nowrap; min-width:0;
+}
+.pill-btn .hint { display:block; font-size:0.62rem; color:var(--text3); margin-top:2px; }
+.pill-btn.active { background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.35); color:var(--accent-h); }
+.pill-btn.active .hint { color:var(--accent-h); opacity:0.7; }
+.pill-btn.gold.active { background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.35); color:var(--gold-h); }
+.pill-btn.gold.active .hint { color:var(--gold-h); opacity:0.7; }
+.pill-btn.green.active { background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3); color:var(--green); }
+
+/* direction toggle */
+.direction-row {
+  display:flex; align-items:center; gap:10px;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--r-sm); padding:10px 14px;
+  font-size:0.82rem; color:var(--text2); cursor:pointer; transition:all 0.2s;
+  user-select:none;
+}
+.direction-row:hover { border-color:var(--accent); color:var(--text); }
+.dir-badge {
+  margin-left:auto; background:rgba(59,130,246,0.12);
+  border:1px solid rgba(59,130,246,0.25); color:var(--accent-h);
+  font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:4px; flex-shrink:0;
+}
+.dir-sub {
+  display:block; font-size:0.7rem; color:var(--text3); margin-top:1px; line-height:1.3;
+}
+
+/* background grid */
+.bg-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:12px;
+}
+.bg-swatch {
+  aspect-ratio:9/16; border-radius:var(--r-sm); overflow:hidden;
+  border:2px solid transparent; cursor:pointer; transition:border-color 0.15s;
+  position:relative;
+}
+.bg-swatch.active { border-color:var(--accent); }
+.bg-swatch-inner { width:100%; height:100%; display:flex; align-items:flex-end; justify-content:center; padding-bottom:5px; }
+.bg-swatch-label { font-size:0.55rem; font-weight:600; color:rgba(255,255,255,0.9); text-shadow:0 1px 4px rgba(0,0,0,0.9); text-align:center; }
+
+.bg-ocean  { background:linear-gradient(180deg,#020d1a,#0a2040 50%,#051226); }
+.bg-sunset { background:linear-gradient(180deg,#1a0800,#7c1f00 40%,#c43a00 70%,#1a0800); }
+.bg-forest { background:linear-gradient(180deg,#020a02,#0a2010 50%,#041208); }
+.bg-purple { background:linear-gradient(180deg,#0d0020,#2d0060 50%,#150030); }
+.bg-slate  { background:linear-gradient(180deg,#0a0c10,#1a2030 50%,#0d1018); }
+.bg-rose   { background:linear-gradient(180deg,#1a020a,#4a0820 50%,#200510); }
+.bg-beach  { background:linear-gradient(180deg,#001a2e,#003d5c 40%,#006080 60%,#004a60); }
+.bg-city   { background:linear-gradient(180deg,#050510,#0d0d2e 60%,#050510); }
+.bg-jungle { background:linear-gradient(180deg,#011002,#052010 40%,#0a3015); }
+.bg-desert { background:linear-gradient(180deg,#200c00,#5a2a00 50%,#804000 70%,#3a1800); }
+.bg-night  { background:linear-gradient(180deg,#000005,#050020 40%,#020015); }
+.bg-custom-ph { background:#1a2235; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:3px; }
+
+/* colour pickers */
+.color-row { display:flex; align-items:center; gap:8px; }
+.color-swatch {
+  width:38px; height:38px; border-radius:var(--r-sm);
+  border:1px solid var(--border2); cursor:pointer; flex-shrink:0; overflow:hidden;
+}
+.color-swatch input[type=color] {
+  width:150%; height:150%; border:none; padding:0; margin:-25%; cursor:pointer; background:none;
+}
+.color-hex { font-size:0.82rem; flex:1; }
+
+/* toggle */
+.toggle-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.toggle-row span { font-size:0.82rem; color:var(--text2); }
+.toggle-row small { font-size:0.7rem; color:var(--text3); }
+.toggle { position:relative; width:42px; height:24px; flex-shrink:0; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-track { position:absolute; inset:0; background:var(--border2); border-radius:24px; cursor:pointer; transition:0.2s; }
+.toggle-track::before { content:''; position:absolute; left:3px; top:3px; width:18px; height:18px; background:var(--text3); border-radius:50%; transition:0.2s; }
+.toggle input:checked+.toggle-track { background:var(--accent); }
+.toggle input:checked+.toggle-track::before { background:#fff; transform:translateX(18px); }
+
+/* slider */
+input[type=range] { width:100%; accent-color:var(--accent); margin-top:6px; cursor:pointer; }
+.slider-val { font-weight:600; color:var(--accent-h); }
+
+/* custom fee input */
+.custom-fee-wrap { display:none; margin-top:8px; }
+.custom-fee-wrap.show { display:block; }
+.custom-fee-wrap input { max-width:120px; }
+
+/* big buttons */
+.gen-btn {
+  width:100%; padding:16px; border:none; border-radius:var(--r); cursor:pointer;
+  font-family:'Outfit',sans-serif; font-size:1rem; font-weight:700;
+  background:linear-gradient(135deg,var(--accent),#6366f1); color:#fff;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all 0.2s; margin-bottom:10px; letter-spacing:0.02em;
+}
+.gen-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(59,130,246,0.3); }
+.gen-btn:active { transform:none; }
+
+.dl-btn {
+  width:100%; padding:13px; border-radius:var(--r); cursor:pointer;
+  font-family:'Outfit',sans-serif; font-size:0.9rem; font-weight:600;
+  background:rgba(16,185,129,0.08); color:var(--green);
+  border:1px solid rgba(16,185,129,0.25);
+  display:none; align-items:center; justify-content:center; gap:6px;
+  transition:all 0.2s;
+}
+.dl-btn.show { display:flex; }
+.dl-btn:hover { background:rgba(16,185,129,0.15); border-color:var(--green); }
+
+/* tip section */
+.tip-card {
+  display:none; margin-top:12px;
+  background:linear-gradient(135deg,rgba(245,158,11,0.05),rgba(59,130,246,0.05));
+  border:1px solid rgba(245,158,11,0.18); border-radius:var(--r);
+  padding:20px; text-align:center;
+}
+.tip-card.show { display:block; }
+.tip-card h4 { font-size:0.9rem; font-weight:700; margin-bottom:4px; }
+.tip-card p { font-size:0.76rem; color:var(--text3); margin-bottom:14px; }
+.tip-btns { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.tip-btn {
+  padding:9px 16px; font-family:'Outfit',sans-serif; font-size:0.78rem; font-weight:600;
+  border-radius:var(--r-sm); text-decoration:none;
+  transition:all 0.2s; display:flex; align-items:center; gap:5px;
+}
+.tip-kofi    { background:rgba(255,94,91,0.12); color:#ff7a78; border:1px solid rgba(255,94,91,0.25); }
+.tip-patreon { background:rgba(255,66,77,0.1);  color:#ff6b75; border:1px solid rgba(255,66,77,0.2); }
+.tip-paypal  { background:rgba(0,112,240,0.1);  color:#5aabff; border:1px solid rgba(0,112,240,0.2); }
+.tip-kofi:hover    { background:rgba(255,94,91,0.22); }
+.tip-patreon:hover { background:rgba(255,66,77,0.18); }
+.tip-paypal:hover  { background:rgba(0,112,240,0.18); }
+
+/* ══════════════════════════════════════════
+   PREVIEW
+══════════════════════════════════════════ */
+.preview-col { position:sticky; top:80px; }
+.preview-label { font-size:0.63rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--text3); text-align:center; margin-bottom:12px; }
+.phone-outer { display:flex; justify-content:center; margin-bottom:14px; }
+.phone-shell {
+  width:270px; border-radius:48px;
+  background:#0d0d12; border:2px solid #252535; padding:4px;
+  box-shadow:0 0 0 1px #08080e,0 0 0 8px #0d0d14,0 0 0 9px #1a1a2a,0 40px 80px rgba(0,0,0,0.9);
+  position:relative; flex-shrink:0;
+}
+.phone-island {
+  position:absolute; top:12px; left:50%; transform:translateX(-50%);
+  width:90px; height:28px; background:#0d0d12;
+  border-radius:20px; z-index:20; box-shadow:0 0 0 2px #1a1a22;
+}
+.phone-screen { border-radius:44px; overflow:hidden; }
+
+/* ══════════════════════════════════════════
+   WALLPAPER CANVAS  — this is what gets captured
+══════════════════════════════════════════ */
+#wp {
+  width:262px; height:568px;
+  position:relative; overflow:hidden;
+  background:#050510; font-family:'Outfit',sans-serif;
+}
+#wp-bg    { position:absolute; inset:0; background-size:cover; background-position:center; }
+#wp-ov    { position:absolute; inset:0; }
+#wp-body  { position:absolute; inset:0; display:flex; flex-direction:column; }
+
+/* clock */
+.wp-clock { padding:36px 18px 8px; text-align:center; flex-shrink:0; }
+.wp-clk-date { font-size:9.5px; color:rgba(255,255,255,0.8); letter-spacing:0.05em; margin-bottom:1px; }
+.wp-clk-time { font-size:52px; font-weight:300; color:#fff; letter-spacing:-3px; line-height:1; text-shadow:0 2px 16px rgba(0,0,0,0.5); }
+
+/* panel */
+.wp-panel {
+  flex:1; margin:4px 9px 9px;
+  background:rgba(0,0,0,0.52); border-radius:13px;
+  border:1px solid rgba(255,255,255,0.07);
+  padding:11px 12px 9px;
+  display:flex; flex-direction:column; min-height:0; overflow:hidden;
+}
+.wp-panel-title {
+  font-size:14px; font-weight:700; text-align:center;
+  letter-spacing:0.3px; margin-bottom:1px;
+}
+.wp-panel-sub {
+  font-size:7px; text-align:center; letter-spacing:0.14em;
+  text-transform:uppercase; margin-bottom:2px;
+  color:rgba(255,255,255,0.45);
+}
+.wp-panel-fee {
+  font-size:7px; text-align:center; letter-spacing:0.08em;
+  color:rgba(255,200,80,0.8); margin-bottom:6px;
+}
+
+/* table */
+.wp-tbl { flex:1; overflow:hidden; display:flex; flex-direction:column; align-items:center; }
+.wp-tbl-inner { width:200px; }
+.wp-tbl-hd, .wp-tbl-row {
+  display:grid;
+  grid-template-columns:1fr 18px 1fr;
+  align-items:center;
+}
+.wp-tbl-hd {
+  padding-bottom:3px; border-bottom:1px solid rgba(255,255,255,0.13);
+  margin-bottom:2px;
+}
+.wp-tbl-row {
+  padding:1.8px 0; border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.wp-tbl-row:last-child { border-bottom:none; }
+.wp-th-dest  { font-size:7px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); text-align:right; padding-right:5px; }
+.wp-th-arrow { font-size:6px; color:transparent; text-align:center; }
+.wp-th-home  { font-size:7px; letter-spacing:0.1em; text-transform:uppercase; padding-left:5px; }
+.wp-td-dest  { font-size:9px; text-align:right; padding-right:5px; }
+.wp-td-arrow { font-size:7px; color:rgba(255,255,255,0.22); text-align:center; }
+.wp-td-home  { font-size:9px; font-weight:600; padding-left:5px; }
+
+/* large text variant */
+.wp-large .wp-panel-title { font-size:13px; }
+.wp-large .wp-tbl-inner { width:210px; }
+.wp-large .wp-tbl-hd { padding-bottom:4px; margin-bottom:3px; }
+.wp-large .wp-th-dest,.wp-large .wp-th-home { font-size:8px; }
+.wp-large .wp-td-dest,.wp-large .wp-td-home { font-size:11px; }
+.wp-large .wp-tbl-row { padding:3px 0; }
+
+/* phrases */
+.wp-phrases { margin-top:5px; padding-top:5px; border-top:1px solid rgba(255,255,255,0.07); }
+.wp-ph-title { font-size:6.5px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.45); text-align:center; margin-bottom:3px; }
+.wp-ph-line  { font-size:7px; color:rgba(255,255,255,0.62); text-align:center; line-height:1.65; }
+
+/* large text phrases */
+.wp-large .wp-ph-title { font-size:8px; }
+.wp-large .wp-ph-line  { font-size:8.5px; }
+
+/* footer + stamp */
+.wp-footer { font-size:8px; font-weight:700; text-align:center; margin-top:5px; padding-top:4px; border-top:1px solid rgba(255,255,255,0.07); }
+.wp-stamp  { font-size:5.5px; color:rgba(255,255,255,0.18); text-align:center; margin-top:3px; letter-spacing:0.08em; }
+
+/* ══════════════════════════════════════════
+   NEWSLETTER
+══════════════════════════════════════════ */
+.newsletter-section {
+  border-top:1px solid var(--border); background:var(--bg2);
+  padding:40px 24px;
+}
+.newsletter-inner { max-width:480px; margin:0 auto; text-align:center; }
+.newsletter-eyebrow {
+  font-size:0.63rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--accent-h); margin-bottom:10px;
+}
+.newsletter-heading { font-size:1.15rem; font-weight:700; color:var(--text); margin-bottom:6px; }
+.newsletter-sub { font-size:0.82rem; color:var(--text2); margin-bottom:22px; line-height:1.6; }
+.newsletter-fields { display:flex; gap:8px; margin-bottom:10px; }
+@media(max-width:480px){ .newsletter-fields{ flex-direction:column; } }
+.newsletter-fields input {
+  flex:1; background:var(--bg); border:1px solid var(--border2);
+  border-radius:var(--r-sm); color:var(--text); font-family:'Outfit',sans-serif;
+  font-size:0.85rem; padding:11px 14px; outline:none; transition:border-color 0.2s;
+}
+.newsletter-fields input:focus { border-color:var(--accent); }
+.newsletter-submit {
+  padding:11px 22px; border:none; border-radius:var(--r-sm); cursor:pointer;
+  font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:700;
+  background:linear-gradient(135deg,var(--accent),#6366f1); color:#fff;
+  white-space:nowrap; transition:all 0.2s; flex-shrink:0;
+}
+.newsletter-submit:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(59,130,246,0.3); }
+.newsletter-submit:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.newsletter-consent {
+  display:flex; align-items:flex-start; gap:10px; text-align:left; margin-bottom:6px;
+}
+.newsletter-consent input[type=checkbox] {
+  width:16px; height:16px; flex-shrink:0; margin-top:2px; accent-color:var(--accent); cursor:pointer;
+}
+.newsletter-consent label { font-size:0.72rem; color:var(--text3); line-height:1.55; cursor:pointer; }
+.newsletter-consent label a { color:var(--text3); text-decoration:underline; }
+.newsletter-consent label a:hover { color:var(--text2); }
+.newsletter-error { font-size:0.72rem; color:#f87171; text-align:left; margin-bottom:6px; display:none; }
+.newsletter-note { font-size:0.7rem; color:var(--text3); line-height:1.6; margin-top:10px; }
+.newsletter-thankyou { display:none; text-align:center; padding:8px 0; }
+.newsletter-thankyou.show { display:block; }
+.newsletter-form-wrap.hide { display:none; }
+.nl-ty-icon { font-size:2rem; margin-bottom:10px; }
+.nl-ty-heading { font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:8px; }
+.nl-ty-body { font-size:0.82rem; color:var(--text2); line-height:1.65; margin-bottom:20px; }
+.nl-ty-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.nl-ty-btn {
+  padding:10px 20px; font-family:'Outfit',sans-serif; font-size:0.82rem; font-weight:600;
+  border-radius:var(--r-sm); text-decoration:none; transition:all 0.2s;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.nl-ty-yt  { background:rgba(255,0,0,0.1); color:#ff5555; border:1px solid rgba(255,0,0,0.25); }
+.nl-ty-yt:hover  { background:rgba(255,0,0,0.18); }
+.nl-ty-tool { background:rgba(59,130,246,0.1); color:var(--accent-h); border:1px solid rgba(59,130,246,0.25); }
+.nl-ty-tool:hover { background:rgba(59,130,246,0.18); }
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+.site-footer { border-top:1px solid var(--border); background:var(--bg2); padding:32px 24px; text-align:center; }
+.footer-inner { max-width:580px; margin:0 auto; }
+.footer-by { font-size:0.8rem; color:var(--text3); margin-bottom:14px; }
+.footer-by a { color:var(--accent-h); text-decoration:none; font-weight:600; }
+.footer-by a:hover { text-decoration:underline; }
+.footer-links { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:18px; }
+.footer-link {
+  font-size:0.75rem; font-weight:500; color:var(--text3);
+  text-decoration:none; padding:6px 14px; border-radius:20px;
+  border:1px solid var(--border); transition:all 0.2s;
+  display:flex; align-items:center; gap:5px;
+}
+.footer-link:hover { color:var(--text); border-color:var(--border2); }
+.footer-fine { font-size:0.67rem; color:var(--text3); line-height:1.8; }
+.footer-fine a { color:var(--text3); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo-wrap" href="#">
+      <div class="logo-icon">🔒</div>
+      <div class="logo-text">Lock<span>Screen</span>FX</div>
+    </a>
+    <div class="header-right">
+      <a class="header-link yt" href="https://www.youtube.com/@JohnTalksUK" target="_blank" rel="noopener">▶ John TalksAbout</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-by">Built by <a href="https://www.youtube.com/@JohnTalksUK" target="_blank" rel="noopener">John TalksAbout</a> — a nomad traveller who needed this</div>
+  <h1>Your travel currency,<br><em>on your lock screen</em></h1>
+  <p class="hero-sub">Generate a wallpaper with rates captured at refresh. Glance at your phone → know the price instantly. No app to open. No mental maths.</p>
+  <div class="rate-bar">
+    <div class="rate-dot"></div>
+    <span id="rate-status-text">Fetching rates…</span>
+    <button class="refresh-btn" onclick="fetchRates()">↻ Refresh</button>
+  </div>
+</section>
+
+<!-- APP -->
+<div class="app-wrap">
+
+  <!-- ═══ CONTROLS ═══ -->
+  <div class="controls-col">
+
+    <!-- Currencies -->
+    <div class="card">
+      <div class="card-title">💱 Currencies</div>
+      <div class="two-col">
+        <div class="field">
+          <label>🏠 Your Currency</label>
+          <select id="home-cur"></select>
+        </div>
+        <div class="field">
+          <label>✈️ Destination</label>
+          <select id="dest-cur"></select>
+          <div class="field-hint">More currencies coming. <a href="https://www.youtube.com/@JohnTalksUK" target="_blank" style="color:var(--accent-h)">Request one →</a></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Conversion Direction</label>
+        <div class="direction-row" onclick="toggleDir()">
+          <span id="dir-label"><span class="dir-main">Destination → Your Currency</span><span class="dir-sub">(what do I pay?)</span></span>
+          <span class="dir-badge">FLIP ⇄</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Amounts -->
+    <div class="card">
+      <div class="card-title">🔢 Conversion Amounts</div>
+      <div class="field">
+        <label>Spend Level</label>
+        <div class="pill-group">
+          <div class="pill-btn ladder-pill active" onclick="setLadder('street',this)">🛺 Street</div>
+          <div class="pill-btn ladder-pill" onclick="setLadder('mid',this)">🏨 Mid</div>
+          <div class="pill-btn ladder-pill" onclick="setLadder('big',this)">💸 Big</div>
+          <div class="pill-btn ladder-pill" onclick="setLadder('atm',this)">🏧 ATM</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Rounding Mode</label>
+        <div class="pill-group">
+          <div class="pill-btn round-pill gold" onclick="setRound('exact',this)">Exact<span class="hint">£2.37</span></div>
+          <div class="pill-btn round-pill gold active" onclick="setRound('tourist',this)">Tourist<span class="hint">≈ £2.50</span></div>
+          <div class="pill-btn round-pill gold" onclick="setRound('budget',this)">Budget ↑<span class="hint">rounds up</span></div>
+        </div>
+        <div class="field-hint" id="round-hint" style="display:none;color:var(--gold-h)">⬆ Budget mode rounds up — always gives a conservative (higher) estimate</div>
+      </div>
+      <div class="field">
+        <label>💳 Card FX Fee</label>
+        <div class="pill-group">
+          <div class="pill-btn fee-pill green active" onclick="setFee(0,this)">No fee<span class="hint">0%</span></div>
+          <div class="pill-btn fee-pill green" onclick="setFee(1,this)">Low fee<span class="hint">1%</span></div>
+          <div class="pill-btn fee-pill green" onclick="setFee(3,this)">Typical<span class="hint">3%</span></div>
+          <div class="pill-btn fee-pill green" onclick="setFee('custom',this)">Custom</div>
+        </div>
+        <div class="custom-fee-wrap" id="custom-fee-wrap">
+          <input type="number" id="custom-fee-input" min="0" max="20" step="0.1" placeholder="e.g. 2.5" oninput="renderPreview()">
+          <div class="field-hint">Enter your card's FX fee %</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Number of Rows</label>
+        <div class="pill-group">
+          <div class="pill-btn row-pill-btn active" onclick="setRows(10,this)">10 rows</div>
+          <div class="pill-btn row-pill-btn" onclick="setRows(15,this)">15 rows</div>
+        </div>
+        <div class="field-hint" id="large-text-note" style="display:none;color:var(--accent-h)">Large text caps rows at 8 automatically</div>
+      </div>
+      <div class="field">
+        <div class="toggle-row">
+          <span>Large Text Mode <small>— shows fewer rows, easier to read</small></span>
+          <label class="toggle"><input type="checkbox" id="large-text" onchange="onLargeTextChange()"><span class="toggle-track"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Background -->
+    <div class="card">
+      <div class="card-title">🎨 Background</div>
+      <div class="bg-grid" id="bg-grid">
+        <div class="bg-swatch active" data-bg="ocean" onclick="setBg('ocean',this)"><div class="bg-swatch-inner bg-ocean"><span class="bg-swatch-label">Ocean</span></div></div>
+        <div class="bg-swatch" data-bg="sunset" onclick="setBg('sunset',this)"><div class="bg-swatch-inner bg-sunset"><span class="bg-swatch-label">Sunset</span></div></div>
+        <div class="bg-swatch" data-bg="forest" onclick="setBg('forest',this)"><div class="bg-swatch-inner bg-forest"><span class="bg-swatch-label">Forest</span></div></div>
+        <div class="bg-swatch" data-bg="purple" onclick="setBg('purple',this)"><div class="bg-swatch-inner bg-purple"><span class="bg-swatch-label">Night</span></div></div>
+        <div class="bg-swatch" data-bg="slate" onclick="setBg('slate',this)"><div class="bg-swatch-inner bg-slate"><span class="bg-swatch-label">Slate</span></div></div>
+        <div class="bg-swatch" data-bg="rose" onclick="setBg('rose',this)"><div class="bg-swatch-inner bg-rose"><span class="bg-swatch-label">Rose</span></div></div>
+        <div class="bg-swatch" data-bg="beach" onclick="setBg('beach',this)"><div class="bg-swatch-inner bg-beach"><span class="bg-swatch-label">Beach</span></div></div>
+        <div class="bg-swatch" data-bg="city" onclick="setBg('city',this)"><div class="bg-swatch-inner bg-city"><span class="bg-swatch-label">City</span></div></div>
+        <div class="bg-swatch" data-bg="jungle" onclick="setBg('jungle',this)"><div class="bg-swatch-inner bg-jungle"><span class="bg-swatch-label">Jungle</span></div></div>
+        <div class="bg-swatch" data-bg="desert" onclick="setBg('desert',this)"><div class="bg-swatch-inner bg-desert"><span class="bg-swatch-label">Desert</span></div></div>
+        <div class="bg-swatch" data-bg="night" onclick="setBg('night',this)"><div class="bg-swatch-inner bg-night"><span class="bg-swatch-label">Stars</span></div></div>
+        <div class="bg-swatch" data-bg="custom" onclick="document.getElementById('bg-file').click()"><div class="bg-swatch-inner bg-custom-ph"><span style="font-size:1.1rem">📸</span><span class="bg-swatch-label" style="color:rgba(255,255,255,0.45)">Upload</span></div></div>
+      </div>
+      <input type="file" id="bg-file" accept="image/*" style="display:none" onchange="handleBgUpload(this)">
+      <div class="field">
+        <label>Overlay Darkness: <span class="slider-val" id="ov-val">42</span>%</label>
+        <input type="range" id="ov-slider" min="0" max="85" value="42" oninput="document.getElementById('ov-val').textContent=this.value;renderPreview()">
+      </div>
+    </div>
+
+    <!-- Text & colours -->
+    <div class="card">
+      <div class="card-title">✏️ Text & Colours</div>
+      <div class="field">
+        <label>Wallpaper Title <small style="color:var(--text3)">(leave blank to hide)</small></label>
+        <input type="text" id="wp-title" value="" placeholder="e.g. Thai Adventure · Bali 2026" oninput="renderPreview()">
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>Title Colour</label>
+          <div class="color-row">
+            <div class="color-swatch" style="background:#ff79c6"><input type="color" id="c-title" value="#ff79c6" oninput="syncCol('c-title','c-title-hex');renderPreview()"></div>
+            <input type="text" class="color-hex" id="c-title-hex" value="#ff79c6" oninput="syncHex('c-title-hex','c-title');renderPreview()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Main Text</label>
+          <div class="color-row">
+            <div class="color-swatch" style="background:#ffffff"><input type="color" id="c-text" value="#ffffff" oninput="syncCol('c-text','c-text-hex');renderPreview()"></div>
+            <input type="text" class="color-hex" id="c-text-hex" value="#ffffff" oninput="syncHex('c-text-hex','c-text');renderPreview()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Rate Column</label>
+          <div class="color-row">
+            <div class="color-swatch" style="background:#f59e0b"><input type="color" id="c-rate" value="#f59e0b" oninput="syncCol('c-rate','c-rate-hex');renderPreview()"></div>
+            <input type="text" class="color-hex" id="c-rate-hex" value="#f59e0b" oninput="syncHex('c-rate-hex','c-rate');renderPreview()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Footer Colour</label>
+          <div class="color-row">
+            <div class="color-swatch" style="background:#f59e0b"><input type="color" id="c-foot" value="#f59e0b" oninput="syncCol('c-foot','c-foot-hex');renderPreview()"></div>
+            <input type="text" class="color-hex" id="c-foot-hex" value="#f59e0b" oninput="syncHex('c-foot-hex','c-foot');renderPreview()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phrases -->
+    <div class="card">
+      <div class="card-title">💬 Essential Phrases</div>
+      <div class="toggle-row">
+        <span>Show phrases on wallpaper</span>
+        <label class="toggle"><input type="checkbox" id="show-phrases" checked onchange="renderPreview()"><span class="toggle-track"></span></label>
+      </div>
+      <div class="field">
+        <label>Phrases <small style="color:var(--text3)">(one per line · English: Translation)</small></label>
+        <textarea id="phrases" oninput="renderPreview()">Hello: Sawasdee (sah-wah-dee)
+Thank you: Khop khun (kop koon)
+Please: Karuna (gah-roo-nah)
+How much?: Tao rai? (tao rye)
+Excuse me: Khor thot (kor-tot)</textarea>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card">
+      <div class="card-title">🪧 Custom Footer</div>
+      <div class="field">
+        <label>Footer Text <small style="color:var(--text3)">(leave blank to hide)</small></label>
+        <input type="text" id="footer-text" value="" placeholder="e.g. John &amp; Yvonne Anniversary 2026" oninput="renderPreview()">
+      </div>
+    </div>
+
+    <!-- Device -->
+    <div class="card">
+      <div class="card-title">📱 Device Type</div>
+      <div class="field">
+        <select id="device" onchange="renderPreview()">
+          <option value="iphone17_pro">iPhone 17 / 17 Air / 17 Pro (1206×2622px) ✦ Latest</option>
+          <option value="iphone17_max">iPhone 17 Pro Max (1320×2868px) ✦ Latest</option>
+          <option value="iphone16_pro">iPhone 16 Pro (1206×2622px)</option>
+          <option value="iphone16">iPhone 16 / 16 Plus (1290×2796px)</option>
+          <option value="iphone16_max">iPhone 16 Pro Max (1320×2868px)</option>
+          <option value="iphone">iPhone 13 / 14 / 15 Pro (1170×2532px)</option>
+          <option value="iphone_max">iPhone 14/15 Pro Max (1290×2796px)</option>
+          <option value="samsung">Samsung Galaxy S/Ultra (1080×2340px)</option>
+          <option value="pixel">Google Pixel (1080×2400px)</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="gen-btn" onclick="generateWallpaper()">✦ Generate Wallpaper</button>
+    <button class="dl-btn" id="dl-btn" onclick="downloadWallpaper()">⬇ Save to Photos</button>
+
+    <!-- Tip (shown after download only) -->
+    <div class="tip-card" id="tip-card">
+      <h4>☕ If this saved you headaches on your travels…</h4>
+      <p>LockScreenFX is completely free. A small tip means a lot and keeps it that way.</p>
+      <div class="tip-btns">
+        <a class="tip-btn tip-kofi"    href="https://ko-fi.com/johntalksabout"              target="_blank" rel="noopener">☕ Ko-fi</a>
+        <a class="tip-btn tip-patreon" href="https://www.patreon.com/cw/JohnTalksAbout"     target="_blank" rel="noopener">🎨 Patreon</a>
+        <a class="tip-btn tip-paypal"  href="https://paypal.me/johntalksabout"               target="_blank" rel="noopener">💳 PayPal</a>
+      </div>
+    </div>
+
+  </div><!-- /controls-col -->
+
+  <!-- ═══ PREVIEW ═══ -->
+  <div class="preview-col">
+    <div class="preview-label">Live Preview</div>
+    <div class="phone-outer">
+      <div class="phone-shell">
+        <div class="phone-island"></div>
+        <div class="phone-screen">
+
+          <div id="wp">
+            <div id="wp-bg"></div>
+            <div id="wp-ov"></div>
+            <div id="wp-body">
+              <div class="wp-clock">
+                <div class="wp-clk-date" id="wp-clk-date">Thursday 26 February</div>
+                <div class="wp-clk-time" id="wp-clk-time">12:00</div>
+              </div>
+              <div class="wp-panel">
+                <div class="wp-panel-title" id="wp-p-title" style="display:none"></div>
+                <div class="wp-panel-sub"   id="wp-p-sub">THB → GBP</div>
+                <div class="wp-panel-fee"   id="wp-p-fee" style="display:none"></div>
+                <div class="wp-tbl"         id="wp-tbl"></div>
+                <div id="wp-phrases-block"></div>
+                <div class="wp-footer" id="wp-footer"></div>
+                <div class="wp-stamp"  id="wp-stamp">Rates captured · lockscreenfx.com</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <p style="font-size:0.67rem;color:var(--text3);text-align:center;line-height:1.7">
+      Hit <strong style="color:var(--text2)">Generate</strong> then <strong style="color:var(--text2)">Save</strong><br>Set as lock screen in your phone settings
+    </p>
+  </div>
+
+</div><!-- /app-wrap -->
+
+<!-- FOOTER -->
+<!-- NEWSLETTER -->
+<section class="newsletter-section">
+  <div class="newsletter-inner">
+
+    <!-- Thank-you state (shown after redirect back with ?subscribed=1) -->
+    <div class="newsletter-thankyou" id="nl-thankyou">
+      <div class="nl-ty-icon">✉️</div>
+      <div class="nl-ty-heading">One step to go — check your inbox</div>
+      <div class="nl-ty-body">
+        We've sent you a confirmation email from John TalksAbout.<br>
+        Click the link inside to confirm your subscription — it only takes a second.<br>
+        <span style="color:var(--text3);font-size:0.75rem">(Check your spam folder if you don't see it within a minute.)</span>
+      </div>
+      <div class="nl-ty-actions">
+        <a class="nl-ty-btn nl-ty-yt" href="https://www.youtube.com/@JohnTalksUK" target="_blank" rel="noopener">▶ Watch on YouTube</a>
+        <a class="nl-ty-btn nl-ty-tool" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑ Back to the tool</a>
+      </div>
+    </div>
+
+    <!-- Form (hidden after successful subscribe) -->
+    <div class="newsletter-form-wrap" id="nl-form-wrap">
+      <div class="newsletter-eyebrow">John TalksAbout Newsletter</div>
+      <div class="newsletter-heading">Travel notes from the road</div>
+      <div class="newsletter-sub">Real stories, honest lessons, and travel hacks from a midlife restart. No fluff — straight to your inbox.</div>
+
+      <form id="nl-form" method="post" action="https://www.aweber.com/scripts/addlead.pl" novalidate>
+        <!-- AWeber required hidden fields -->
+        <input type="hidden" name="listname"           value="awlist6916238">
+        <input type="hidden" name="meta_adtracking"    value="lockscreenfx_footer">
+        <input type="hidden" name="meta_message"       value="1">
+        <input type="hidden" name="meta_required"      value="email">
+        <input type="hidden" name="meta_forward_vars"  value="0">
+        <!-- Redirect set dynamically at runtime from current origin — works on any domain -->
+        <input type="hidden" name="redirect"            value="" id="nl-redirect">
+        <input type="hidden" name="meta_redirect_onlist" value="" id="nl-redirect-onlist">
+
+        <div class="newsletter-fields">
+          <input type="text"  name="name"  id="nl-name"  placeholder="First name" autocomplete="given-name">
+          <input type="email" name="email" id="nl-email" placeholder="Email address" autocomplete="email" required>
+          <button type="submit" class="newsletter-submit" id="nl-submit">Subscribe →</button>
+        </div>
+
+        <div class="newsletter-consent">
+          <input type="checkbox" id="nl-consent" name="nl-consent">
+          <label for="nl-consent">
+            Tick to get the John TalksAbout newsletter (you can unsubscribe anytime). Sent via AWeber.
+            <span id="nl-privacy-link"></span>
+          </label>
+        </div>
+        <div class="newsletter-error" id="nl-error">Please tick the box above to confirm you'd like to receive the newsletter.</div>
+
+        <div class="newsletter-note">
+          📬 You'll receive a confirmation email — click the link inside to complete your signup.
+        </div>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-by">
+      Built by <a href="https://www.youtube.com/@JohnTalksUK" target="_blank" rel="noopener">John TalksAbout</a> — nomad traveller, making travel content from the road
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://www.youtube.com/@JohnTalksUK"           target="_blank" rel="noopener">▶ YouTube</a>
+      <a class="footer-link" href="https://ko-fi.com/johntalksabout"               target="_blank" rel="noopener">☕ Ko-fi</a>
+      <a class="footer-link" href="https://www.patreon.com/cw/JohnTalksAbout"      target="_blank" rel="noopener">🎨 Patreon</a>
+      <a class="footer-link" href="https://paypal.me/johntalksabout"                target="_blank" rel="noopener">💳 PayPal</a>
+    </div>
+    <div class="footer-fine">
+      Rates from <a href="https://open.er-api.com" target="_blank">open.er-api.com</a> — updated daily — for guidance only, not financial advice.<br>
+      LockScreenFX is free forever. No ads. No login. Just useful.
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════ */
+const CURRENCIES=[
+  {code:'AED',flag:'🇦🇪',name:'UAE Dirham'},
+  {code:'ARS',flag:'🇦🇷',name:'Argentine Peso'},
+  {code:'AUD',flag:'🇦🇺',name:'Australian Dollar'},
+  {code:'BBD',flag:'🇧🇧',name:'Barbadian Dollar'},
+  {code:'BGN',flag:'🇧🇬',name:'Bulgarian Lev'},
+  {code:'BRL',flag:'🇧🇷',name:'Brazilian Real'},
+  {code:'CAD',flag:'🇨🇦',name:'Canadian Dollar'},
+  {code:'CHF',flag:'🇨🇭',name:'Swiss Franc'},
+  {code:'CLP',flag:'🇨🇱',name:'Chilean Peso'},
+  {code:'CNY',flag:'🇨🇳',name:'Chinese Yuan'},
+  {code:'COP',flag:'🇨🇴',name:'Colombian Peso'},
+  {code:'CZK',flag:'🇨🇿',name:'Czech Koruna'},
+  {code:'DKK',flag:'🇩🇰',name:'Danish Krone'},
+  {code:'EGP',flag:'🇪🇬',name:'Egyptian Pound'},
+  {code:'EUR',flag:'🇪🇺',name:'Euro'},
+  {code:'FJD',flag:'🇫🇯',name:'Fijian Dollar'},
+  {code:'GBP',flag:'🇬🇧',name:'British Pound'},
+  {code:'HKD',flag:'🇭🇰',name:'Hong Kong Dollar'},
+  {code:'HUF',flag:'🇭🇺',name:'Hungarian Forint'},
+  {code:'IDR',flag:'🇮🇩',name:'Indonesian Rupiah'},
+  {code:'ILS',flag:'🇮🇱',name:'Israeli Shekel'},
+  {code:'INR',flag:'🇮🇳',name:'Indian Rupee'},
+  {code:'ISK',flag:'🇮🇸',name:'Icelandic Króna'},
+  {code:'JMD',flag:'🇯🇲',name:'Jamaican Dollar'},
+  {code:'JOD',flag:'🇯🇴',name:'Jordanian Dinar'},
+  {code:'JPY',flag:'🇯🇵',name:'Japanese Yen'},
+  {code:'KHR',flag:'🇰🇭',name:'Cambodian Riel'},
+  {code:'KRW',flag:'🇰🇷',name:'Korean Won'},
+  {code:'LKR',flag:'🇱🇰',name:'Sri Lankan Rupee'},
+  {code:'MAD',flag:'🇲🇦',name:'Moroccan Dirham'},
+  {code:'MXN',flag:'🇲🇽',name:'Mexican Peso'},
+  {code:'MYR',flag:'🇲🇾',name:'Malaysian Ringgit'},
+  {code:'NOK',flag:'🇳🇴',name:'Norwegian Krone'},
+  {code:'NZD',flag:'🇳🇿',name:'New Zealand Dollar'},
+  {code:'PEN',flag:'🇵🇪',name:'Peruvian Sol'},
+  {code:'PHP',flag:'🇵🇭',name:'Philippine Peso'},
+  {code:'PLN',flag:'🇵🇱',name:'Polish Zloty'},
+  {code:'RON',flag:'🇷🇴',name:'Romanian Leu'},
+  {code:'RSD',flag:'🇷🇸',name:'Serbian Dinar'},
+  {code:'SAR',flag:'🇸🇦',name:'Saudi Riyal'},
+  {code:'SEK',flag:'🇸🇪',name:'Swedish Krona'},
+  {code:'THB',flag:'🇹🇭',name:'Thai Baht'},
+  {code:'TRY',flag:'🇹🇷',name:'Turkish Lira'},
+  {code:'TTD',flag:'🇹🇹',name:'Trinidad & Tobago Dollar'},
+  {code:'USD',flag:'🇺🇸',name:'US Dollar'},
+  {code:'UYU',flag:'🇺🇾',name:'Uruguayan Peso'},
+  {code:'VND',flag:'🇻🇳',name:'Vietnamese Dong'},
+  {code:'ZAR',flag:'🇿🇦',name:'South African Rand'},
+];
+
+const DEFAULT_PHRASES={
+  THB:'Hello: Sawasdee (sah-wah-dee)\nThank you: Khop khun (kop koon)\nPlease: Karuna (gah-roo-nah)\nHow much?: Tao rai? (tao rye)\nExcuse me: Khor thot (kor-tot)',
+  MYR:'Hello: Helo (heh-loh)\nThank you: Terima kasih (teh-ree-mah kah-see)\nPlease: Tolong (toh-long)\nHow much?: Berapa harga? (beh-rah-pah)\nSorry: Maaf (mah-ahf)',
+  IDR:'Hello: Halo (hah-loh)\nThank you: Terima kasih (teh-ree-mah kah-see)\nHow much?: Berapa harganya?\nExcuse me: Permisi (per-mee-see)\nPlease: Tolong (toh-long)',
+  JPY:'Hello: Konnichiwa (kon-ee-chee-wah)\nThank you: Arigatou (ah-ree-gah-toh)\nExcuse me: Sumimasen (soo-mee-mah-sen)\nHow much?: Ikura desu ka?\nSorry: Gomen nasai',
+  VND:'Hello: Xin chào (seen jow)\nThank you: Cảm ơn (gam uhn)\nHow much?: Bao nhiêu? (bow nyew)\nExcuse me: Xin lỗi (seen loy)\nPlease: Làm ơn (lahm uhn)',
+  KHR:'Hello: Sua s\'dei (soo-a s\'day)\nThank you: Orkun (or-kun)\nHow much?: T\'lai ponmaan?\nExcuse me: Soum tous (sum-toos)\nPlease: Soum (sum)',
+  PHP:'Hello: Kamusta (kah-moos-tah)\nThank you: Salamat (sah-lah-maht)\nHow much?: Magkano? (mag-kah-no)\nPlease: Pakiusap (pah-kee-oo-sahp)\nExcuse me: Excuse po',
+  INR:'Hello: Namaste (nah-mah-stay)\nThank you: Dhanyavaad (dhan-yah-vahd)\nHow much?: Kitna hai? (kit-nah hai)\nPlease: Kripya (krip-yah)\nExcuse me: Maaf kijiye',
+  LKR:'Hello: Ayubowan (eye-oo-bo-wan)\nThank you: Bohoma istuti (bo-ho-mah)\nHow much?: Kiyada? (kee-yah-dah)\nPlease: Karuna karala\nExcuse me: Samaavenna',
+  MAD:'Hello: Salam (sah-lahm)\nThank you: Shukran (shook-rahn)\nHow much?: Bshhal? (bsh-hal)\nPlease: Afak (ah-fahk)\nExcuse me: Smeh liya',
+  EUR:'',
+  TRY:'Hello: Merhaba (mair-hah-bah)\nThank you: Teşekkür (tesh-ek-er)\nHow much?: Ne kadar? (neh kah-dar)\nPlease: Lütfen (lut-fen)\nExcuse me: Pardon (par-don)',
+  ZAR:'Hello: Hallo / Sawubona\nThank you: Dankie / Ngiyabonga\nHow much?: Hoeveel? / Malini?\nPlease: Asseblief\nExcuse me: Verskoon my',
+  EGP:'Hello: Ahlan (ah-lahn)\nThank you: Shukran (shook-rahn)\nHow much?: Bikam? (bee-kahm)\nPlease: Law samaht\nExcuse me: Lao samaht',
+};
+
+// Ladders: [street, mid, big, atm]
+const LADDERS={
+  THB:[[10,20,50,100,150,200,250,300,400,500,750,1000,1500,2000,3000],
+       [500,1000,1500,2000,3000,4000,5000,7500,10000,12000,15000,20000,25000,30000,40000],
+       [5000,7500,10000,15000,20000,30000,50000,75000,100000,150000,200000,250000,300000,400000,500000],
+       [1000,2000,3000,5000,7500,10000,15000,20000,30000,40000,50000,75000,100000,150000,200000]],
+  MYR:[[1,2,5,10,15,20,25,30,40,50,60,75,100,120,150],
+       [50,100,150,200,250,300,400,500,600,750,1000,1250,1500,2000,2500],
+       [500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,12000,15000,20000,25000],
+       [100,200,250,300,400,500,600,750,1000,1500,2000,2500,3000,4000,5000]],
+  IDR:[[10000,20000,50000,75000,100000,150000,200000,250000,300000,500000,750000,1000000,1500000,2000000,3000000],
+       [100000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,4000000,5000000,7500000,10000000,12000000,15000000],
+       [500000,1000000,2000000,3000000,5000000,7500000,10000000,15000000,20000000,30000000,50000000,75000000,100000000,150000000,200000000],
+       [500000,1000000,2000000,3000000,5000000,10000000,15000000,20000000,30000000,50000000,75000000,100000000,150000000,200000000,300000000]],
+  JPY:[[100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,15000],
+       [1000,2000,3000,5000,7500,10000,15000,20000,25000,30000,40000,50000,75000,100000,150000],
+       [5000,10000,15000,20000,30000,50000,75000,100000,150000,200000,250000,300000,400000,500000,750000],
+       [5000,10000,20000,30000,50000,75000,100000,150000,200000,250000,300000,400000,500000,750000,1000000]],
+  VND:[[10000,20000,50000,100000,150000,200000,250000,300000,500000,750000,1000000,1500000,2000000,3000000,5000000],
+       [100000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,4000000,5000000,7500000,10000000,15000000,20000000],
+       [1000000,2000000,3000000,5000000,7500000,10000000,15000000,20000000,30000000,50000000,75000000,100000000,150000000,200000000,300000000],
+       [1000000,2000000,5000000,10000000,20000000,30000000,50000000,75000000,100000000,150000000,200000000,300000000,500000000,750000000,1000000000]],
+  KRW:[[1000,2000,5000,10000,15000,20000,25000,30000,50000,75000,100000,150000,200000,300000,500000],
+       [10000,20000,50000,100000,150000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,4000000,5000000],
+       [50000,100000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,5000000,7500000,10000000,15000000,20000000],
+       [50000,100000,200000,500000,1000000,2000000,3000000,5000000,7500000,10000000,15000000,20000000,30000000,50000000,75000000]],
+};
+function getLadder(code,ldr){
+  const i={street:0,mid:1,big:2,atm:3}[ldr]||0;
+  if(LADDERS[code]) return LADDERS[code][i];
+  const fb={
+    street:[1,2,5,10,20,30,50,75,100,150,200,250,300,400,500],
+    mid:[50,100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000],
+    big:[500,1000,2000,3000,5000,7500,10000,15000,20000,25000,30000,40000,50000,75000,100000],
+    atm:[100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000],
+  };
+  return fb[ldr]||fb.street;
+}
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let ratesData={};
+let ratesUpdatedStr='';
+let lastFetchTime=0;         // cooldown guard — prevents spam via keyboard/automation
+let currentBg='ocean';
+let customBgUrl=null;
+let currentLadder='street';
+let currentRows=10;
+let currentRound='tourist';
+let currentFee=0;   // numeric %
+let feeIsCustom=false;
+let dirFlipped=false;
+let largeText=false;
+
+const BG_CSS={
+  ocean: 'linear-gradient(180deg,#020d1a,#0a2040 50%,#051226)',
+  sunset:'linear-gradient(180deg,#1a0800,#7c1f00 40%,#c43a00 70%,#1a0800)',
+  forest:'linear-gradient(180deg,#020a02,#0a2010 50%,#041208)',
+  purple:'linear-gradient(180deg,#0d0020,#2d0060 50%,#150030)',
+  slate: 'linear-gradient(180deg,#0a0c10,#1a2030 50%,#0d1018)',
+  rose:  'linear-gradient(180deg,#1a020a,#4a0820 50%,#200510)',
+  beach: 'linear-gradient(180deg,#001a2e,#003d5c 40%,#006080 60%,#004a60)',
+  city:  'linear-gradient(180deg,#050510,#0d0d2e 60%,#050510)',
+  jungle:'linear-gradient(180deg,#011002,#052010 40%,#0a3015)',
+  desert:'linear-gradient(180deg,#200c00,#5a2a00 50%,#804000 70%,#3a1800)',
+  night: 'linear-gradient(180deg,#000005,#050020 40%,#020015)',
+};
+const DEVICE_SIZES={
+  iphone17_pro: {w:1206,h:2622},   // iPhone 17, 17 Air, 17 Pro
+  iphone17_max: {w:1320,h:2868},   // iPhone 17 Pro Max
+  iphone16_pro: {w:1206,h:2622},   // iPhone 16 Pro
+  iphone16:     {w:1290,h:2796},   // iPhone 16, 16 Plus
+  iphone16_max: {w:1320,h:2868},   // iPhone 16 Pro Max
+  iphone:       {w:1170,h:2532},   // iPhone 13/14/15 Pro
+  iphone_max:   {w:1290,h:2796},   // iPhone 14/15 Pro Max
+  samsung:      {w:1080,h:2340},
+  pixel:        {w:1080,h:2400},
+};
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+function buildSelects(){
+  const h=document.getElementById('home-cur');
+  const d=document.getElementById('dest-cur');
+  CURRENCIES.forEach(c=>{
+    const makeOpt=(sel)=>{
+      const o=document.createElement('option');
+      o.value=c.code; o.textContent=`${c.flag} ${c.code} — ${c.name}`;
+      if(sel) o.selected=true; return o;
+    };
+    h.appendChild(makeOpt(c.code==='GBP'));
+    d.appendChild(makeOpt(c.code==='THB'));
+  });
+  h.addEventListener('change',renderPreview);
+  d.addEventListener('change',onDestChange);
+}
+
+function onDestChange(){
+  const code=document.getElementById('dest-cur').value;
+  if(DEFAULT_PHRASES[code]!==undefined){
+    document.getElementById('phrases').value=DEFAULT_PHRASES[code];
+  }
+  renderPreview();
+}
+
+/* ═══════════════════════════════════════════
+   RATES
+═══════════════════════════════════════════ */
+async function fetchRates(){
+  const now=Date.now();
+  if(now-lastFetchTime<3000) return;  // 3s cooldown — ignores keyboard/automation spam
+  lastFetchTime=now;
+  const statusEl=document.getElementById('rate-status-text');
+  const refreshBtn=document.querySelector('.refresh-btn');
+  statusEl.textContent='Fetching rates…';
+  refreshBtn.disabled=true;
+  refreshBtn.style.opacity='0.4';
+  const bases=['GBP','USD','EUR','AUD','CAD'];
+  try{
+    const results=await Promise.all(bases.map(b=>fetch(`https://open.er-api.com/v6/latest/${b}`).then(r=>r.json())));
+    results.forEach((d,i)=>{ if(d.result==='success') ratesData[bases[i]]=d.rates; });
+    try{
+      const d=new Date(results[0].time_last_update_utc);
+      ratesUpdatedStr=isNaN(d)?'recently':d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    }catch(e){ ratesUpdatedStr='recently'; }
+    statusEl.textContent=`✓ Current rates — ${ratesUpdatedStr}`;
+  }catch(e){
+    // Fallback rates
+    ratesData.GBP={THB:44.15,MYR:5.62,USD:1.27,EUR:1.18,AUD:1.95,CAD:1.73,JPY:193,IDR:20500,VND:32000,KHR:5180,PHP:72,INR:106,LKR:380,ZAR:23.5,MXN:22.8,TRY:42,MAD:12.7,EGP:62,NZD:2.12,CHF:1.13,SEK:13.2,NOK:13.8,DKK:8.8,PLN:5.1,CZK:29.2,HUF:460,RON:5.85,BGN:2.3,HKD:9.9,CNY:9.2,KRW:1690,ILS:4.65,AED:4.67,SAR:4.76,JOD:0.9,BRL:7.3,CLP:1180,COP:5100,PEN:4.7,UYU:52,ARS:1250,BBD:2.57,TTD:8.6,JMD:198,ISK:173,FJD:2.85,RSD:138};
+    ratesData.USD={THB:34.8,MYR:4.42,GBP:0.79,EUR:0.93,AUD:1.53,CAD:1.37,JPY:152,IDR:16100,VND:25200,KHR:4075,PHP:56.5,INR:83.5,LKR:299,ZAR:18.5,MXN:17.9,TRY:33,MAD:10,EGP:49,NZD:1.67,CHF:0.89,SEK:10.4,NOK:10.9,DKK:6.9};
+    ratesData.EUR={THB:37.4,MYR:4.75,GBP:0.85,USD:1.08,AUD:1.65,CAD:1.48,JPY:164,IDR:17400,VND:27100,KHR:4390,PHP:61,INR:90,LKR:322,ZAR:19.9,MXN:19.3,TRY:35.5,MAD:10.8,EGP:52.5,NZD:1.79,CHF:0.96};
+    ratesData.AUD={THB:22.6,MYR:2.88,GBP:0.51,USD:0.65,EUR:0.61,CAD:0.89,JPY:98,IDR:10400,VND:16400,PHP:36.7,INR:54.3};
+    ratesData.CAD={THB:25.5,MYR:3.25,GBP:0.58,USD:0.73,EUR:0.68,AUD:1.12,JPY:111,IDR:11700,VND:18500};
+    ratesUpdatedStr='cached';   // renders as: "Rates captured: cached · lockscreenfx.com"
+    statusEl.textContent='⚠ Offline — using cached rates';
+  }finally{
+    refreshBtn.disabled=false;
+    refreshBtn.style.opacity='';
+  }
+  renderPreview();
+}
+
+function getRate(homeCode,destCode){
+  if(homeCode===destCode) return 1;
+  if(ratesData[homeCode]&&ratesData[homeCode][destCode]) return ratesData[homeCode][destCode];
+  // Cross via USD
+  if(ratesData.USD&&ratesData.USD[homeCode]&&ratesData.USD[destCode]) return ratesData.USD[destCode]/ratesData.USD[homeCode];
+  // Cross via GBP
+  if(ratesData.GBP&&ratesData.GBP[homeCode]&&ratesData.GBP[destCode]) return ratesData.GBP[destCode]/ratesData.GBP[homeCode];
+  return null;
+}
+
+/* ═══════════════════════════════════════════
+   ROUNDING
+═══════════════════════════════════════════ */
+function doRound(val,mode){
+  if(mode==='exact') return +val.toFixed(2);
+  if(mode==='tourist'){
+    if(val>=1000) return Math.round(val/50)*50;
+    if(val>=100)  return Math.round(val/5)*5;
+    if(val>=10)   return Math.round(val);
+    if(val>=1)    return Math.round(val*2)/2;
+    return +val.toFixed(2);
+  }
+  if(mode==='budget'){
+    // Always round UP (ceiling) — conservative estimate
+    if(val>=1000) return Math.ceil(val/50)*50;
+    if(val>=100)  return Math.ceil(val/5)*5;
+    if(val>=10)   return Math.ceil(val);
+    if(val>=1)    return Math.ceil(val*2)/2;
+    return Math.ceil(val*100)/100;
+  }
+  return +val.toFixed(2);
+}
+function fmtNum(v){
+  if(typeof v==='number') return v.toLocaleString('en-GB');
+  return v;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER PREVIEW
+═══════════════════════════════════════════ */
+function renderPreview(){
+  const homeCode=document.getElementById('home-cur').value;
+  const destCode=document.getElementById('dest-cur').value;
+  const homeCur=CURRENCIES.find(c=>c.code===homeCode);
+  const destCur=CURRENCIES.find(c=>c.code===destCode);
+  const isAndroid=document.getElementById('device').value==='samsung'||document.getElementById('device').value==='pixel';
+
+  // Update download button text based on device
+  const dlBtn=document.getElementById('dl-btn');
+  dlBtn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos';
+
+  // Clock
+  const now=new Date();
+  document.getElementById('wp-clk-time').textContent=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  document.getElementById('wp-clk-date').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+
+  // Large text class
+  const wp=document.getElementById('wp');
+  largeText=document.getElementById('large-text').checked;
+  wp.classList.toggle('wp-large',largeText);
+  const maxRows=largeText?8:currentRows;
+
+  // BG + overlay
+  const bgEl=document.getElementById('wp-bg');
+  document.getElementById('wp-ov').style.background=`rgba(0,0,0,${document.getElementById('ov-slider').value/100})`;
+  if(currentBg==='custom'&&customBgUrl){
+    bgEl.style.backgroundImage=`url(${customBgUrl})`;
+  } else {
+    bgEl.style.backgroundImage=BG_CSS[currentBg]||BG_CSS.ocean;
+  }
+
+  // Title
+  const titleEl=document.getElementById('wp-p-title');
+  const titleVal=document.getElementById('wp-title').value.trim();
+  const titleColor=document.getElementById('c-title').value;
+  titleEl.textContent=titleVal; titleEl.style.color=titleColor;
+  titleEl.style.display=titleVal?'':'none';
+
+  // Subtitle
+  const fromCode=dirFlipped?homeCode:destCode;
+  const toCode=dirFlipped?destCode:homeCode;
+  const fromCur=dirFlipped?homeCur:destCur;
+  const toCur=dirFlipped?destCur:homeCur;
+  document.getElementById('wp-p-sub').textContent=`${fromCur.flag} ${fromCode} → ${toCur.flag} ${toCode}`;
+
+  // Fee note
+  const feeEl=document.getElementById('wp-p-fee');
+  const fee=getEffectiveFee();
+  if(fee>0){
+    feeEl.textContent=`incl. ${fee}% card fee`;
+    feeEl.style.display='';
+  } else {
+    feeEl.style.display='none';
+  }
+
+  // Table
+  const textColor=document.getElementById('c-text').value;
+  const rateColor=document.getElementById('c-rate').value;
+  const baseCode=dirFlipped?homeCode:destCode;
+  const amounts=getLadder(baseCode,currentLadder).slice(0,maxRows);
+  const rawRate=getRate(homeCode,destCode);
+  const feeMultiplier=1+(fee/100);
+
+  let html=`<div class="wp-tbl-inner"><div class="wp-tbl-hd">
+    <div class="wp-th-dest" style="color:rgba(255,255,255,0.3)">${fromCur.flag} ${fromCode}</div>
+    <div class="wp-th-arrow"></div>
+    <div class="wp-th-home" style="color:${rateColor}">${toCur.flag} ${toCode}</div>
+  </div>`;
+
+  amounts.forEach(amt=>{
+    let converted='—';
+    if(rawRate!==null){
+      // dirFlipped=false: dest→home: home = dest_amt / rate  (rate = dest per 1 home)
+      // dirFlipped=true:  home→dest: dest = home_amt * rate
+      const raw=dirFlipped ? amt*rawRate : amt/rawRate;
+      const withFee=dirFlipped ? raw/feeMultiplier : raw*feeMultiplier;
+      converted=fmtNum(doRound(withFee,currentRound));
+    }
+    html+=`<div class="wp-tbl-row">
+      <div class="wp-td-dest" style="color:${textColor};opacity:0.72">${amt.toLocaleString()}</div>
+      <div class="wp-td-arrow">→</div>
+      <div class="wp-td-home" style="color:${rateColor}">${converted}</div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('wp-tbl').innerHTML=html;
+
+  // Phrases
+  const phBlock=document.getElementById('wp-phrases-block');
+  const showPh=document.getElementById('show-phrases').checked;
+  const phText=document.getElementById('phrases').value.trim();
+  if(showPh&&phText){
+    const lines=phText.split('\n').filter(l=>l.trim()).slice(0,largeText?4:6);
+    let ph='<div class="wp-phrases"><div class="wp-ph-title">Essential Phrases</div>';
+    lines.forEach(l=>{ ph+=`<div class="wp-ph-line">${l.trim()}</div>`; });
+    ph+='</div>';
+    phBlock.innerHTML=ph;
+  } else { phBlock.innerHTML=''; }
+
+  // Footer
+  const footerEl=document.getElementById('wp-footer');
+  const footerVal=document.getElementById('footer-text').value.trim();
+  const footerColor=document.getElementById('c-foot').value;
+  footerEl.textContent=footerVal; footerEl.style.color=footerColor;
+  footerEl.style.display=footerVal?'':'none';
+
+  // Stamp
+  const stampDate=ratesUpdatedStr?`Rates captured: ${ratesUpdatedStr}`:'Rates fetching…';
+  document.getElementById('wp-stamp').textContent=`${stampDate} · lockscreenfx.com`;
+}
+
+/* ═══════════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════════ */
+function setBg(key,el){
+  currentBg=key;
+  document.querySelectorAll('.bg-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderPreview();
+}
+function handleBgUpload(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    customBgUrl=e.target.result; currentBg='custom';
+    document.querySelectorAll('.bg-swatch').forEach(s=>s.classList.remove('active'));
+    document.querySelector('[data-bg="custom"]').classList.add('active');
+    renderPreview();
+  };
+  r.readAsDataURL(f);
+}
+function setLadder(name,el){
+  currentLadder=name;
+  el.closest('.pill-group').querySelectorAll('.ladder-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderPreview();
+}
+function setRows(n,el){
+  currentRows=n;
+  el.closest('.pill-group').querySelectorAll('.row-pill-btn').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderPreview();
+}
+function setRound(mode,el){
+  currentRound=mode;
+  el.closest('.pill-group').querySelectorAll('.pill-btn').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  const hint=document.getElementById('round-hint');
+  hint.style.display=mode==='budget'?'':'none';
+  renderPreview();
+}
+function getEffectiveFee(){
+  if(feeIsCustom){
+    const v=parseFloat(document.getElementById('custom-fee-input').value);
+    return isNaN(v)?0:v;
+  }
+  return currentFee;
+}
+function setFee(val,el){
+  el.closest('.pill-group').querySelectorAll('.pill-btn').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  const wrap=document.getElementById('custom-fee-wrap');
+  if(val==='custom'){
+    feeIsCustom=true; wrap.classList.add('show');
+  } else {
+    feeIsCustom=false; currentFee=val; wrap.classList.remove('show');
+  }
+  renderPreview();
+}
+function onLargeTextChange(){
+  const on=document.getElementById('large-text').checked;
+  document.querySelectorAll('.row-pill-btn').forEach(p=>{
+    p.disabled=on;               // true when on, false when off — explicitly resets
+    p.style.opacity=on?'0.35':'1';
+    p.style.pointerEvents=on?'none':'auto';
+  });
+  const note=document.getElementById('large-text-note');
+  if(note) note.style.display=on?'':'none';
+  renderPreview();
+}
+function toggleDir(){
+  dirFlipped=!dirFlipped;
+  const lbl=document.getElementById('dir-label');
+  lbl.innerHTML=dirFlipped
+    ?'<span class="dir-main">Your Currency → Destination</span><span class="dir-sub">(budgeting &amp; withdrawals) · Fees reduce what you receive.</span>'
+    :'<span class="dir-main">Destination → Your Currency</span><span class="dir-sub">(what do I pay?)</span>';
+  renderPreview();
+}
+function syncCol(pickId,hexId){
+  const v=document.getElementById(pickId).value;
+  document.getElementById(hexId).value=v;
+  document.getElementById(pickId).closest('.color-swatch').style.background=v;
+}
+function syncHex(hexId,pickId){
+  const v=document.getElementById(hexId).value;
+  if(/^#[0-9a-f]{6}$/i.test(v)){
+    document.getElementById(pickId).value=v;
+    document.getElementById(pickId).closest('.color-swatch').style.background=v;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   GENERATE & DOWNLOAD
+═══════════════════════════════════════════ */
+function generateWallpaper(){
+  renderPreview();
+  saveSettings();  // persist settings on every generate, not just download
+  const btn=document.getElementById('dl-btn');
+  btn.classList.add('show');
+  btn.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+async function downloadWallpaper(){
+  const btn=document.getElementById('dl-btn');
+  btn.textContent='⏳ Generating…'; btn.disabled=true;
+  try{
+    const el=document.getElementById('wp');
+    const deviceVal=document.getElementById('device').value;
+    const size=DEVICE_SIZES[deviceVal];
+    const scale=Math.min(size.w/262, 3.5); // clamped — prevents blank exports on older phones
+    const canvas=await html2canvas(el,{
+      scale:scale, useCORS:true, allowTaint:true,
+      backgroundColor:null, logging:false, width:262, height:568,
+    });
+    const link=document.createElement('a');
+    const home=document.getElementById('home-cur').value;
+    const dest=document.getElementById('dest-cur').value;
+    link.download=`lockscreenfx-${dest}-${home}.png`;
+    link.href=canvas.toDataURL('image/png',1.0);
+    link.click();
+    const isAndroid=deviceVal==='samsung'||deviceVal==='pixel';
+    btn.textContent=isAndroid?'✓ Downloaded! Set as lock screen in Settings.':'✓ Saved! Set as lock screen in Photos.';
+    document.getElementById('tip-card').classList.add('show');
+    document.getElementById('tip-card').scrollIntoView({behavior:'smooth',block:'nearest'});
+    saveSettings();
+  }catch(err){
+    btn.textContent='⚠ Failed — right-click the preview to save';
+    console.error(err);
+  }
+  setTimeout(()=>{
+    const isAndroid=document.getElementById('device').value==='samsung'||document.getElementById('device').value==='pixel';
+    btn.textContent=isAndroid?'⬇ Download Wallpaper':'⬇ Save to Photos';
+    btn.disabled=false;
+  },4000);
+}
+
+/* ═══════════════════════════════════════════
+   LOCALSTORAGE
+═══════════════════════════════════════════ */
+function saveSettings(){
+  try{
+    localStorage.setItem('lsfx',JSON.stringify({
+      home:document.getElementById('home-cur').value,
+      dest:document.getElementById('dest-cur').value,
+      title:document.getElementById('wp-title').value,
+      footer:document.getElementById('footer-text').value,
+      phrases:document.getElementById('phrases').value,
+      showPhrases:document.getElementById('show-phrases').checked,
+      cTitle:document.getElementById('c-title').value,
+      cText:document.getElementById('c-text').value,
+      cRate:document.getElementById('c-rate').value,
+      cFoot:document.getElementById('c-foot').value,
+      overlay:document.getElementById('ov-slider').value,
+      bg:currentBg, ladder:currentLadder, rows:currentRows,
+      round:currentRound, fee:currentFee, feeCustom:feeIsCustom,
+      customFeeVal:document.getElementById('custom-fee-input').value,  // ← save the actual % typed
+      dir:dirFlipped, largeText:document.getElementById('large-text').checked,
+    }));
+  }catch(e){}
+}
+function loadSettings(){
+  try{
+    const s=JSON.parse(localStorage.getItem('lsfx'));
+    if(!s) return;
+    if(s.home) document.getElementById('home-cur').value=s.home;
+    if(s.dest) document.getElementById('dest-cur').value=s.dest;
+    if(s.title!==undefined) document.getElementById('wp-title').value=s.title;
+    if(s.footer!==undefined) document.getElementById('footer-text').value=s.footer;
+    if(s.phrases!==undefined) document.getElementById('phrases').value=s.phrases;
+    if(s.showPhrases!==undefined) document.getElementById('show-phrases').checked=s.showPhrases;
+    const applyColor=(pickId,hexId,val)=>{
+      if(!val) return;
+      document.getElementById(pickId).value=val;
+      document.getElementById(hexId).value=val;
+      document.getElementById(pickId).closest('.color-swatch').style.background=val;
+    };
+    applyColor('c-title','c-title-hex',s.cTitle);
+    applyColor('c-text','c-text-hex',s.cText);
+    applyColor('c-rate','c-rate-hex',s.cRate);
+    applyColor('c-foot','c-foot-hex',s.cFoot);
+    if(s.overlay){ document.getElementById('ov-slider').value=s.overlay; document.getElementById('ov-val').textContent=s.overlay; }
+    if(s.bg){ currentBg=s.bg; document.querySelectorAll('.bg-swatch').forEach(sw=>sw.classList.toggle('active',sw.dataset.bg===s.bg)); }
+    if(s.ladder) currentLadder=s.ladder;
+    if(s.rows) currentRows=s.rows;
+    if(s.round) currentRound=s.round;
+    if(s.fee!==undefined){ currentFee=s.fee; }
+    if(s.feeCustom!==undefined) feeIsCustom=s.feeCustom;
+    if(s.customFeeVal!==undefined) document.getElementById('custom-fee-input').value=s.customFeeVal;
+    if(s.dir!==undefined){ dirFlipped=s.dir; if(s.dir) document.getElementById('dir-label').innerHTML='<span class="dir-main">Your Currency → Destination</span><span class="dir-sub">(budgeting &amp; withdrawals) · Fees reduce what you receive.</span>'; }
+    if(s.largeText!==undefined) document.getElementById('large-text').checked=s.largeText;
+  }catch(e){}
+}
+
+function restoreUIState(s){
+  // Ladder pills
+  const ladderMap={street:0,mid:1,big:2,atm:3};
+  if(s.ladder){
+    const ladderPills=document.querySelectorAll('.ladder-pill');
+    ladderPills.forEach((p,i)=>p.classList.toggle('active',i===ladderMap[s.ladder]));
+  }
+  // Rounding pills
+  const roundMap={exact:0,tourist:1,budget:2};
+  if(s.round!==undefined){
+    const roundPills=document.querySelectorAll('.round-pill');
+    roundPills.forEach((p,i)=>p.classList.toggle('active',i===roundMap[s.round]));
+    document.getElementById('round-hint').style.display=s.round==='budget'?'':'none';
+  }
+  // Fee pills
+  const feeValues=[0,1,3,'custom'];
+  if(s.fee!==undefined||s.feeCustom){
+    const feePills=document.querySelectorAll('.fee-pill');
+    const activeFeeIdx=s.feeCustom?3:feeValues.indexOf(s.fee);
+    feePills.forEach((p,i)=>p.classList.toggle('active',i===activeFeeIdx));
+    const wrap=document.getElementById('custom-fee-wrap');
+    if(s.feeCustom){ wrap.classList.add('show'); }
+    else { wrap.classList.remove('show'); }
+    if(s.customFeeVal!==undefined) document.getElementById('custom-fee-input').value=s.customFeeVal;
+  }
+  // Rows pills
+  if(s.rows){
+    document.querySelectorAll('.row-pill-btn').forEach(p=>{
+      p.classList.toggle('active',parseInt(p.textContent)===s.rows);
+    });
+  }
+  // Large text
+  if(s.largeText){
+    const note=document.getElementById('large-text-note');
+    if(note) note.style.display='';
+    document.querySelectorAll('.row-pill-btn').forEach(p=>{ p.disabled=true; p.style.opacity='0.35'; p.style.pointerEvents='none'; });
+  }
+  // Direction
+  if(s.dir){
+    document.getElementById('dir-label').innerHTML='<span class="dir-main">Your Currency → Destination</span><span class="dir-sub">(budgeting &amp; withdrawals) · Fees reduce what you receive.</span>';
+  }
+}
+setInterval(()=>{
+  const el=document.getElementById('wp-clk-time');
+  if(el) el.textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+},30000);
+
+/* ═══════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════ */
+buildSelects();
+loadSettings();
+try{
+  const s=JSON.parse(localStorage.getItem('lsfx'));
+  if(s) restoreUIState(s);
+}catch(e){}
+fetchRates();
+
+/* ═══════════════════════════════════════════
+   NEWSLETTER
+═══════════════════════════════════════════ */
+
+// ── Config (swap these when you have a privacy policy page)
+const PRIVACY_POLICY_URL = ''; // e.g. 'https://lockscreenfx.com/privacy' — leave blank to show "coming soon"
+
+// ── Set redirect URLs dynamically from current origin (works on any domain / localhost)
+(function setRedirects(){
+  const base = window.location.origin + window.location.pathname;
+  const url  = base + (base.endsWith('/') ? '' : '/') + '?subscribed=1';
+  // Handle file:// during local testing — fall back to aweber's own thank-you
+  const isSafe = window.location.protocol === 'https:' || window.location.protocol === 'http:';
+  const dest = isSafe ? url : 'https://johntalksabout.aweb.page/thank-you';
+  document.getElementById('nl-redirect').value         = dest;
+  document.getElementById('nl-redirect-onlist').value  = dest;
+})();
+
+// ── Privacy policy link — show link if set, "coming soon" if blank, nothing if truly unset
+(function setPrivacyLink(){
+  const el = document.getElementById('nl-privacy-link');
+  if(!el) return;
+  if(PRIVACY_POLICY_URL){
+    el.innerHTML = ' · <a href="'+PRIVACY_POLICY_URL+'" target="_blank" rel="noopener">Privacy policy</a>.';
+  } else {
+    el.innerHTML = ' · <span style="color:var(--text3);font-size:0.68rem">Privacy policy coming soon.</span>';
+  }
+})();
+
+// ── On-page thank-you: check for ?subscribed=1 in URL
+(function checkSubscribed(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('subscribed') === '1'){
+    document.getElementById('nl-thankyou').classList.add('show');
+    document.getElementById('nl-form-wrap').classList.add('hide');
+    setTimeout(()=>{
+      document.querySelector('.newsletter-section').scrollIntoView({behavior:'smooth',block:'start'});
+    }, 400);
+    history.replaceState(null,'',window.location.pathname);
+  }
+})();
+
+// ── Form validation — consent required; name optional (meta_required=email only)
+document.getElementById('nl-form').addEventListener('submit', function(e){
+  const consent  = document.getElementById('nl-consent');
+  const email    = document.getElementById('nl-email');
+  const errorEl  = document.getElementById('nl-error');
+
+  if(!consent.checked){
+    e.preventDefault();
+    errorEl.style.display = 'block';
+    consent.focus();
+    return;
+  }
+  if(!email.value.trim()){
+    e.preventDefault();
+    email.focus();
+    return;
+  }
+  errorEl.style.display = 'none';
+  const btn = document.getElementById('nl-submit');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+});
+
+// ── Hide error when user ticks the box
+document.getElementById('nl-consent').addEventListener('change', function(){
+  if(this.checked) document.getElementById('nl-error').style.display='none';
+});
+</script>
+</body>
+</html>
